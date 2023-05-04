@@ -33,9 +33,11 @@ class TokenType(Enum):  # listing all tokens type
 
     # Other
     String = 22
-    Identifier = 23
+    Sympol = 23
     Function = 24
     Error = 25
+    Number = 26
+    Identifier = 27
 
 
 # class token to hold string and token type
@@ -59,7 +61,8 @@ Keywords = {"(": TokenType.OpenParenthesis,
             "read": TokenType.Read,
             "write": TokenType.Write,
             "t": TokenType.LogicalTrue,
-            "nil": TokenType.LogicalFalse
+            "nil": TokenType.LogicalFalse,
+            "setq": TokenType.Function
             }
 
 Operators = {";": TokenType.Semicolon,
@@ -79,26 +82,103 @@ Operators = {";": TokenType.Semicolon,
 
 Tokens = []  # to add tokens to list
 
-def find_token(text):
+
+def tokenize(text):
+    text = text.lower()  # because lisp is case-insensitive
     keywords_regex = '|'.join(re.escape(x) for x in Keywords.keys())
     operators_regex = '|'.join(re.escape(x) for x in Operators.keys())
-    string_regex = r'"(?:\\.|[^"])*"'
-    identifier_regex = r'[a-zA-Z][a-zA-Z0-9]*'
 
-    regex = f'({keywords_regex})|({operators_regex})|({string_regex})|({identifier_regex})'
-    tokens = re.findall(regex, text)
+    constants_regex = r"[0-9]+(\.[0-9]*)?"
+    lisp_identifier_regex = r'[A-Za-z\*\+\-\/<=>&][\w\*\+\-\/<=>&]*'
+    while text:
+        # ignore whitespace
+        if text[0].isspace():
+            text = text[1:]
+            continue
 
-    for token in tokens:
-        if token[0]:
-            Tokens.append(Token(token[0], Keywords[token[0]]))
-        elif token[1]:
-            Tokens.append(Token(token[1], Operators[token[1]]))
-        elif token[2]:
-            Tokens.append(Token(token[2].strip('"'), TokenType.String))
-        elif token[3]:
-            Tokens.append(Token(token[3], TokenType.Identifier))
+        # remove comments
+        if text[0] == ';':
+            ending = text.find('\n')
+            if ending == -1:
+                text = ""
+                break
+            text = text[ending + 1:]
+            continue
 
+        # match brackets
+        if text[0] == '(':
+            Tokens.append(Token(text[0], TokenType.OpenParenthesis))
+            text = text[1:]
+            continue
+        elif text[0] == ')':
+            Tokens.append(Token(text[0], TokenType.CloseParenthesis))
+            text = text[1:]
+            continue
+
+        # string found
+        if text[0] == '"':
+            closing = text.find('"', 1)
+            if closing == -1:
+                Tokens.append(Token(text, TokenType.Error))
+                text = ""
+            else:
+                Tokens.append(Token(text[:closing + 1], TokenType.String))
+                text = text[closing + 1:]
+            continue
+
+        if not text: break
+        # search for reserved words
+        keyword_match = re.match(keywords_regex, text)
+        if keyword_match and (text[keyword_match.end()] == ' ' or text[keyword_match.end()] == ')'):
+            Tokens.append(Token(keyword_match.group(), Keywords[keyword_match.group()]))
+            text = text[keyword_match.end():]
+            continue
+
+        # search for constants
+        constant_match = re.match(constants_regex, text)
+        if constant_match:
+            Tokens.append(Token(constant_match.group(), TokenType.Number))
+            text = text[constant_match.end():]
+            continue
+
+        # search for identifiers
+        identifier_match = re.match(lisp_identifier_regex, text)
+        if identifier_match:
+            word = identifier_match.group()
+            temp = re.findall("\w|\d", word)
+            if len(temp) == 0:
+                Tokens.append(Token(identifier_match.group(), TokenType.Sympol))
+            else:
+                Tokens.append(Token(identifier_match.group(), TokenType.Identifier))
+            text = text[identifier_match.end():]
+            continue
+
+        # search for Ops
+
+        op_match = re.match(operators_regex, text)
+        if op_match:
+            Tokens.append(Token(op_match.group(), Operators[op_match.group()]))
+            text = text[op_match.end():]
+            continue
+
+        # invalid token
+        jump = text.find(' ') # mafrod akamel l7ad awl space wla law la2eet ")" awa2f???
+        if jump == -1:
+            Tokens.append(Token(text, TokenType.Error))
+            text = ""
+        else:
+            Tokens.append(Token(text[:jump], TokenType.Error))
+            text = text[jump + 1:]
+
+
+def main():
+    s = """("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 11)\n (write n) (write (* n n)) \"this is a string\" \n (setq whenx 10 t)
+        \n (> A B) \n (setq $d) 10)
+        """
+    find_token(s)
     for t in Tokens:
-        print(t.lex,",",t.token_type)
+        print(t.lex, ",", t.token_type)
 
-find_token("(dotimes (n 11)\n (write n) (write (* n n)) \"this is a string\" ")
+
+if __name__ == "__main__":
+    main()
