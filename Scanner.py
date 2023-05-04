@@ -1,5 +1,5 @@
-
 from enum import Enum
+import re
 
 
 class TokenType(Enum):  # listing all tokens type
@@ -79,6 +79,26 @@ Operators = {";": TokenType.Semicolon,
 
 Tokens = []  # to add tokens to list
 
-
 def find_token(text):
-    atoms = text.split()
+    keywords_regex = '|'.join(re.escape(x) for x in Keywords.keys())
+    operators_regex = '|'.join(re.escape(x) for x in Operators.keys())
+    string_regex = r'"(?:\\.|[^"])*"'
+    identifier_regex = r'[a-zA-Z][a-zA-Z0-9]*'
+
+    regex = f'({keywords_regex})|({operators_regex})|({string_regex})|({identifier_regex})'
+    tokens = re.findall(regex, text)
+
+    for token in tokens:
+        if token[0]:
+            Tokens.append(Token(token[0], Keywords[token[0]]))
+        elif token[1]:
+            Tokens.append(Token(token[1], Operators[token[1]]))
+        elif token[2]:
+            Tokens.append(Token(token[2].strip('"'), TokenType.String))
+        elif token[3]:
+            Tokens.append(Token(token[3], TokenType.Identifier))
+
+    for t in Tokens:
+        print(t.lex,",",t.token_type)
+
+find_token("(dotimes (n 11)\n (write n) (write (* n n)) \"this is a string\" ")
