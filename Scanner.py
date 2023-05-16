@@ -89,6 +89,7 @@ def tokenize(text):
     operators_regex = '|'.join(re.escape(x) for x in Operators.keys())
 
     constants_regex = r"[0-9]+(\.[0-9]*)?"
+
     lisp_identifier_regex = r'[A-Za-z\*\+\-\/<=>&][\w\*\+\-\/<=>&]*'
     while text:
         # ignore whitespace
@@ -136,7 +137,7 @@ def tokenize(text):
 
         # search for constants
         constant_match = re.match(constants_regex, text)
-        if constant_match:
+        if constant_match and (text[constant_match.end()] == ' ' or text[constant_match.end()] == ')'):
             Tokens.append(Token(constant_match.group(), TokenType.Number))
             text = text[constant_match.end():]
             continue
@@ -162,7 +163,7 @@ def tokenize(text):
             continue
 
         # invalid token
-        jump = text.find(' ') # mafrod akamel l7ad awl space wla law la2eet ")" awa2f???
+        jump = text.find(' ')  # mafrod akamel l7ad awl space wla law la2eet ")" awa2f???
         if jump == -1:
             Tokens.append(Token(text, TokenType.Error))
             text = ""
@@ -172,10 +173,10 @@ def tokenize(text):
 
 
 def main():
-    s = """("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 11)\n (write n) (write (* n n)) \"this is a string\" \n (setq whenx 10 t)
-        \n (> A B) \n (setq $d) 10)
+    s = """("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 11)\n (write n) (write (* n n)) \"this is a string\" \n (setq x 10)
+        \n (> A B) \n (setq 54ght $d) 10)
         """
-    find_token(s)
+    tokenize(s)
     for t in Tokens:
         print(t.lex, ",", t.token_type)
 
