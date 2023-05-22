@@ -173,8 +173,7 @@ def tokenize(text):
 
 
 def main():
-    s = """("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 11)\n (write n) (write (* n n)) \"this is a string\" \n (setq x 10)
-        \n (> A B) \n (setq 54ght $d) 10)
+    s = """read 
         """
     tokenize(s)
     for t in Tokens:
