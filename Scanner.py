@@ -137,7 +137,8 @@ def tokenize(text):
 
         # search for constants
         constant_match = re.match(constants_regex, text)
-        if constant_match and (text[constant_match.end()] == ' ' or text[constant_match.end()] == ')'):
+        if constant_match and (constant_match.end() >= len(text) or text[constant_match.end()] == ' ' or text[constant_match.end()] == '('
+                or text[constant_match.end()] == ')' or text[constant_match.end()] == '\n'):
             Tokens.append(Token(constant_match.group(), TokenType.Number))
             text = text[constant_match.end():]
             continue
@@ -163,18 +164,24 @@ def tokenize(text):
             continue
 
         # invalid token
-        jump = text.find(' ')  # mafrod akamel l7ad awl space wla law la2eet ")" awa2f???
+        jump = -1  # mafrod akamel l7ad awl space wla law la2eet ")" awa2f???
+        for i, char in enumerate(text):
+            if char == ' ' or char == ')' or char == '(':
+                jump = i
+                break
+
         if jump == -1:
             Tokens.append(Token(text, TokenType.Error))
             text = ""
         else:
             Tokens.append(Token(text[:jump], TokenType.Error))
-            text = text[jump + 1:]
+            text = text[jump:]
 
 
 def main():
-    s = """read 
-        """
+    s = """)(!@ 12.34(read 11x) ("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 111x )\n (write n) (write (* n n)) \"this is a string\" \n (setq x 10)
+        \n (> A B) \n (setq 54ght $d) 106t8 ) 12.34
+    """
     tokenize(s)
     for t in Tokens:
         print(t.lex, ",", t.token_type)
