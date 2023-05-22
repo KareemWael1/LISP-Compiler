@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import tkinter as tk
 
+
 class TokenType(Enum):  # listing all tokens type
 
     # List Representation
@@ -39,10 +40,13 @@ class TokenType(Enum):  # listing all tokens type
 
     # Other
     String = 22
-    Function = 23
+    Setq = 23
     Error = 24
     Number = 25
     Identifier = 26
+    Cos = 27
+    Sin = 28
+    Tan = 29
 
 
 # class token to hold string and token type
@@ -65,9 +69,12 @@ Keywords = {"(": TokenType.OpenParenthesis,
             "when": TokenType.When,
             "read": TokenType.Read,
             "write": TokenType.Write,
-            "t": TokenType.LogicalTrue,
             "nil": TokenType.LogicalFalse,
-            "setq": TokenType.Function
+            "setq": TokenType.Setq,
+            "cos": TokenType.Cos,
+            "tan": TokenType.Tan,
+            "t": TokenType.LogicalTrue,
+            "sin": TokenType.Sin
             }
 
 Operators = {";": TokenType.Semicolon,
@@ -88,60 +95,64 @@ Operators = {";": TokenType.Semicolon,
 Tokens = []  # to add tokens to list
 
 keywords_tokenType = [TokenType.OpenParenthesis,
-                TokenType.CloseParenthesis,
-                TokenType.Dotimes,
-                TokenType.When,
-                TokenType.Read,
-                TokenType.Write,
-                TokenType.LogicalTrue,
-                TokenType.LogicalFalse,
-                TokenType.Function]
+                      TokenType.CloseParenthesis,
+                      TokenType.Dotimes,
+                      TokenType.When,
+                      TokenType.Read,
+                      TokenType.Write,
+                      TokenType.LogicalTrue,
+                      TokenType.LogicalFalse,
+                      TokenType.Function]
 
 operators_tokenType = [TokenType.Semicolon,
-             TokenType.PlusOp,
-             TokenType.MinusOp,
-             TokenType.MultiplyOp,
-             TokenType.DivideOp,
-             TokenType.ModOp,
-             TokenType.RemOp,
-             TokenType.IncrementOp,
-             TokenType.DecrementOp,
-             TokenType.LessThanOrEqualOp,
-             TokenType.GreaterThanOrEqualOp,
-             TokenType.EqualOp,
-             TokenType.NotEqualOp]
+                       TokenType.PlusOp,
+                       TokenType.MinusOp,
+                       TokenType.MultiplyOp,
+                       TokenType.DivideOp,
+                       TokenType.ModOp,
+                       TokenType.RemOp,
+                       TokenType.IncrementOp,
+                       TokenType.DecrementOp,
+                       TokenType.LessThanOrEqualOp,
+                       TokenType.GreaterThanOrEqualOp,
+                       TokenType.EqualOp,
+                       TokenType.NotEqualOp]
 
 input_chars = {
     'letter': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
     'digit': '0123456789',
     'operator': '+-*/<=>!&|~%',
-    'identifier_operator':'+-*/<=>&_',
+    'identifier_operator': '+-*/<=>&_',
     'whitespace': ' \n\t',
-    'dot':'.',
-    'special_char':'#\')\"(`',
-    'double_quote':'"',
+    'dot': '.',
+    'special_char': '#\')\"(`',
+    'double_quote': '"',
     'ALL': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-*/<=>!&|~% \n\t.#\')(`'
 }
 
-
 Constant_transitions = [
-    { 'from': 0, 'to': 1, 'chars': input_chars['digit'] , 'label': 'digit'},
-    { 'from': 0, 'to': 4, 'chars': input_chars['dot'] , 'label': '.' },
-    { 'from': 1, 'to': 1, 'chars': input_chars['digit'] , 'label': 'digit'},
-    { 'from': 1, 'to': 2, 'chars': input_chars['dot'] , 'label': '.' },
-    { 'from': 2, 'to': 3, 'chars': input_chars['digit'], 'label': 'digit' },
-    { 'from': 2, 'to': 4, 'chars': input_chars['dot'], 'label': '.' },
-    { 'from': 3, 'to': 3, 'chars': input_chars['digit'], 'label': 'digit' },
-    { 'from': 3, 'to': 4, 'chars': input_chars['dot'], 'label': '.' },
-    { 'from': 4, 'to': 4, 'chars': input_chars['dot'] + input_chars['digit'] , 'label': '. digit' },
+    {'from': 0, 'to': 1, 'chars': input_chars['digit'], 'label': 'digit'},
+    {'from': 0, 'to': 4, 'chars': input_chars['dot'], 'label': '.'},
+    {'from': 1, 'to': 1, 'chars': input_chars['digit'], 'label': 'digit'},
+    {'from': 1, 'to': 2, 'chars': input_chars['dot'], 'label': '.'},
+    {'from': 2, 'to': 3, 'chars': input_chars['digit'], 'label': 'digit'},
+    {'from': 2, 'to': 4, 'chars': input_chars['dot'], 'label': '.'},
+    {'from': 3, 'to': 3, 'chars': input_chars['digit'], 'label': 'digit'},
+    {'from': 3, 'to': 4, 'chars': input_chars['dot'], 'label': '.'},
+    {'from': 4, 'to': 4, 'chars': input_chars['dot'] + input_chars['digit'], 'label': '. digit'},
 ]
 
 identifiers_transitions = [
-    { 'from': 0, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'] , 'label': 'letter +-*/<=>&_'},
-    { 'from': 0, 'to': 2, 'chars': input_chars['digit'] + input_chars['special_char'] , 'label': 'digit special_character' },
-    { 'from': 1, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'] , 'label': 'letter +-*/<=>&_' },
-    { 'from': 1, 'to': 2, 'chars': input_chars['special_char'] , 'label': 'special_character'},
-    { 'from': 2, 'to': 2, 'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'] + input_chars['special_char'] , 'label': 'any' },
+    {'from': 0, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'],
+     'label': 'letter +-*/<=>&_'},
+    {'from': 0, 'to': 2, 'chars': input_chars['digit'] + input_chars['special_char'],
+     'label': 'digit special_character'},
+    {'from': 1, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'],
+     'label': 'letter +-*/<=>&_'},
+    {'from': 1, 'to': 2, 'chars': input_chars['special_char'], 'label': 'special_character'},
+    {'from': 2, 'to': 2,
+     'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'] + input_chars[
+         'special_char'], 'label': 'any'},
 ]
 
 string_transitions = [
@@ -254,9 +265,8 @@ string_dfa = graphviz.Digraph('s', filename='string')
 keywords_dfa = graphviz.Digraph('k', filename='keyword')
 operators_dfa = graphviz.Digraph('o', filename='operator')
 
-
-keywords_dfa.attr(size = '13,9.5', rankdir= 'LR', ranksep='0.05', nodesep='0.2')
-operators_dfa.attr(size = '13,9.5', rankdir= 'LR', ranksep='0.05', nodesep='0.2')
+keywords_dfa.attr(size='13,9.5', rankdir='LR', ranksep='0.05', nodesep='0.2')
+operators_dfa.attr(size='13,9.5', rankdir='LR', ranksep='0.05', nodesep='0.2')
 
 #  constant dfa
 const_accept_states = [1, 3]
@@ -277,6 +287,7 @@ key_reject_states = [22]
 # operator dfa
 op_accpet_states = [6]
 op_reject_states = [11]
+
 
 def tokenize(text):
     text = text.lower()  # because lisp is case-insensitive
@@ -397,10 +408,10 @@ def create_dfa(wanted_dfa, wanted_transitions, accept_states, reject_states, st)
 
 
 DFA = None
-node_colors = {'0': 'white', '1': 'white', '2': 'white','3': 'white','4': 'red'}
+node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'red'}
+
 
 def get_dfa(t_type):
-
     if t_type == TokenType.Number:
         DFA = constant_dfa
         node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'red'}
@@ -438,7 +449,10 @@ def get_dfa(t_type):
         label_node = '12'
     return DFA, node_colors, Transisions, label_node
 
+
 frames = []
+
+
 def update(frame):
     frames.clear()
     for token in Tokens:
@@ -448,7 +462,7 @@ def update(frame):
         for state, color in node_colors.items():
             DFA.node(state, fillcolor=color, style='filled')
         chars = token.lex
-        DFA.node(label_node,shape = 'rectangle',label = str(chars))
+        DFA.node(label_node, shape='rectangle', label=str(chars))
         for char in chars:
             print(char)
             next_state = None
@@ -466,12 +480,13 @@ def update(frame):
             current_state = next_state
 
             for state, color in node_colors.items():
-                DFA.node(state, fillcolor=color,style='filled')
+                DFA.node(state, fillcolor=color, style='filled')
             img = DFA.render(format='png')
             im = imageio.v2.imread(img)
             frames.append(im)
 
     return frames
+
 
 root = tk.Tk()
 root.title("Tokenize Input")
@@ -485,6 +500,7 @@ input_box.pack()
 animation_label = None
 
 already_pressed = False
+
 
 def scan():
     global already_pressed, frames
@@ -510,6 +526,7 @@ def scan():
     time.sleep(0.5)
     Tokens.clear()
     display_animation()
+
 
 def display_animation():
     global animation_label, already_pressed, frames
@@ -541,6 +558,7 @@ def display_animation():
     root.after(0, update_image, 1)
     already_pressed = True
 
+
 tokenize_button = tk.Button(root, text="Tokenize Input", command=scan)
 tokenize_button.pack()
 
@@ -549,6 +567,7 @@ create_dfa(identifier_dfa, identifiers_transitions, iden_accept_states, iden_rej
 create_dfa(string_dfa, string_transitions, str_accpet_states, str_reject_states, '4')
 create_dfa(keywords_dfa, keywords_transition, key_accpet_states, key_reject_states, '23')
 create_dfa(operators_dfa, operators_transitions, op_accpet_states, op_reject_states, '12')
+
 
 # root.mainloop()
 
