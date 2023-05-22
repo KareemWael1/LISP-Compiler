@@ -1,6 +1,12 @@
 from enum import Enum
 import re
-
+import graphviz
+import time
+import imageio
+from PIL import Image, ImageTk
+import pandas as pd
+import numpy as np
+import tkinter as tk
 
 class TokenType(Enum):  # listing all tokens type
 
@@ -81,6 +87,196 @@ Operators = {";": TokenType.Semicolon,
 
 Tokens = []  # to add tokens to list
 
+keywords_tokenType = [TokenType.OpenParenthesis,
+                TokenType.CloseParenthesis,
+                TokenType.Dotimes,
+                TokenType.When,
+                TokenType.Read,
+                TokenType.Write,
+                TokenType.LogicalTrue,
+                TokenType.LogicalFalse,
+                TokenType.Function]
+
+operators_tokenType = [TokenType.Semicolon,
+             TokenType.PlusOp,
+             TokenType.MinusOp,
+             TokenType.MultiplyOp,
+             TokenType.DivideOp,
+             TokenType.ModOp,
+             TokenType.RemOp,
+             TokenType.IncrementOp,
+             TokenType.DecrementOp,
+             TokenType.LessThanOrEqualOp,
+             TokenType.GreaterThanOrEqualOp,
+             TokenType.EqualOp,
+             TokenType.NotEqualOp]
+
+input_chars = {
+    'letter': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+    'digit': '0123456789',
+    'operator': '+-*/<=>!&|~%',
+    'identifier_operator':'+-*/<=>&_',
+    'whitespace': ' \n\t',
+    'dot':'.',
+    'special_char':'#\')\"(`',
+    'double_quote':'"',
+    'ALL': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-*/<=>!&|~% \n\t.#\')(`'
+}
+
+
+Constant_transitions = [
+    { 'from': 0, 'to': 1, 'chars': input_chars['digit'] , 'label': 'digit'},
+    { 'from': 0, 'to': 4, 'chars': input_chars['dot'] , 'label': '.' },
+    { 'from': 1, 'to': 1, 'chars': input_chars['digit'] , 'label': 'digit'},
+    { 'from': 1, 'to': 2, 'chars': input_chars['dot'] , 'label': '.' },
+    { 'from': 2, 'to': 3, 'chars': input_chars['digit'], 'label': 'digit' },
+    { 'from': 2, 'to': 4, 'chars': input_chars['dot'], 'label': '.' },
+    { 'from': 3, 'to': 3, 'chars': input_chars['digit'], 'label': 'digit' },
+    { 'from': 3, 'to': 4, 'chars': input_chars['dot'], 'label': '.' },
+    { 'from': 4, 'to': 4, 'chars': input_chars['dot'] + input_chars['digit'] , 'label': '. digit' },
+]
+
+identifiers_transitions = [
+    { 'from': 0, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'] , 'label': 'letter +-*/<=>&_'},
+    { 'from': 0, 'to': 2, 'chars': input_chars['digit'] + input_chars['special_char'] , 'label': 'digit special_character' },
+    { 'from': 1, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'] , 'label': 'letter +-*/<=>&_' },
+    { 'from': 1, 'to': 2, 'chars': input_chars['special_char'] , 'label': 'special_character'},
+    { 'from': 2, 'to': 2, 'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'] + input_chars['special_char'] , 'label': 'any' },
+]
+
+string_transitions = [
+    {'from': 0, 'to': 1, 'chars': input_chars['double_quote'], 'label': '"'},
+    {'from': 0, 'to': 0, 'chars': input_chars['ALL'], 'label': 'any input'},
+    {'from': 1, 'to': 1, 'chars': input_chars['ALL'], 'label': 'any input'},
+    {'from': 1, 'to': 2, 'chars': input_chars['double_quote'], 'label': '"'},
+    {'from': 2, 'to': 1, 'chars': input_chars['double_quote'], 'label': '"'},
+    {'from': 2, 'to': 3, 'chars': input_chars['ALL'], 'label': 'any input'},
+    {'from': 3, 'to': 3, 'chars': input_chars['ALL'], 'label': 'any input'}
+]
+
+keywords_transition = [
+    {'from': 0, 'to': 1, 'chars': 'd', 'label': 'd'},
+    {'from': 1, 'to': 2, 'chars': 'o', 'label': 'o'},
+    {'from': 2, 'to': 3, 'chars': 't', 'label': 't'},
+    {'from': 3, 'to': 4, 'chars': 'i', 'label': 'i'},
+    {'from': 4, 'to': 5, 'chars': 'm', 'label': 'm'},
+    {'from': 5, 'to': 6, 'chars': 'e', 'label': 'e'},
+    {'from': 6, 'to': 7, 'chars': 's', 'label': 's'},
+    {'from': 0, 'to': 8, 'chars': 'w', 'label': 'w'},
+    {'from': 8, 'to': 9, 'chars': 'h', 'label': 'h'},
+    {'from': 9, 'to': 10, 'chars': 'e', 'label': 'e'},
+    {'from': 10, 'to': 7, 'chars': 'n', 'label': 'n'},
+    {'from': 8, 'to': 11, 'chars': 'r', 'label': 'r'},
+    {'from': 11, 'to': 12, 'chars': 'i', 'label': 'i'},
+    {'from': 12, 'to': 13, 'chars': 't', 'label': 't'},
+    {'from': 13, 'to': 7, 'chars': 'e', 'label': 'e'},
+    {'from': 0, 'to': 7, 'chars': ')(t', 'label': ')( t'},
+    {'from': 0, 'to': 14, 'chars': 'r', 'label': 'r'},
+    {'from': 14, 'to': 15, 'chars': 'e', 'label': 'e'},
+    {'from': 15, 'to': 16, 'chars': 'a', 'label': 'a'},
+    {'from': 16, 'to': 7, 'chars': 'd', 'label': 'd'},
+    {'from': 0, 'to': 17, 'chars': 'n', 'label': 'n'},
+    {'from': 17, 'to': 18, 'chars': 'i', 'label': 'i'},
+    {'from': 18, 'to': 7, 'chars': 'l', 'label': 'l'},
+    {'from': 0, 'to': 19, 'chars': 's', 'label': 's'},
+    {'from': 19, 'to': 20, 'chars': 'e', 'label': 'e'},
+    {'from': 20, 'to': 21, 'chars': 't', 'label': 't'},
+    {'from': 21, 'to': 7, 'chars': 'q', 'label': 'q'},
+    {'from': 0, 'to': 22, 'chars': 'oimehalq', 'label': 'oimehalq'},
+    {'from': 1, 'to': 22, 'chars': 'dtimeswhnralq)(', 'label': 'dtimeswhnralq)('},
+    {'from': 2, 'to': 22, 'chars': 'doimeswhnralq)(', 'label': 'doimeswhnralq)('},
+    {'from': 3, 'to': 22, 'chars': 'dotmeswhnralq)(', 'label': 'dotmeswhnralq)('},
+    {'from': 4, 'to': 22, 'chars': 'dotieswhnralq)(', 'label': 'dotieswhnralq)('},
+    {'from': 5, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 6, 'to': 22, 'chars': 'dotimewhnralq)(', 'label': 'dotimewhnralq)('},
+    {'from': 8, 'to': 22, 'chars': 'dotimeswnalq)(', 'label': 'dotimeswnalq)('},
+    {'from': 9, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 10, 'to': 22, 'chars': 'dotimeswhralq)(', 'label': 'dotimeswhralq)('},
+    {'from': 11, 'to': 22, 'chars': 'dotmeswhnralq)(', 'label': 'dotmeswhnralq)('},
+    {'from': 12, 'to': 22, 'chars': 'doimeswhnralq)(', 'label': 'doimeswhnralq)('},
+    {'from': 13, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 14, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 15, 'to': 22, 'chars': 'dotimeswhnrlq)(', 'label': 'dotimeswhnrlq)('},
+    {'from': 16, 'to': 22, 'chars': 'otimeswhnralq)(', 'label': 'otimeswhnralq)('},
+    {'from': 17, 'to': 22, 'chars': 'dotmeswhnralq)(', 'label': 'dotmeswhnralq)('},
+    {'from': 18, 'to': 22, 'chars': 'dotimeswhnraq)(', 'label': 'dotimeswhnraq)('},
+    {'from': 19, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 20, 'to': 22, 'chars': 'doimeswhnralq)(', 'label': 'doimeswhnralq)('},
+    {'from': 21, 'to': 22, 'chars': 'dotimeswhnral)(', 'label': 'dotimeswhnral)('},
+    {'from': 22, 'to': 22, 'chars': 'dotimeswhnralq)(', 'label': 'dotimeswhnralq)('},
+    {'from': 7, 'to': 7, 'chars': 't)(', 'label': 't)('},
+    {'from': 7, 'to': 1, 'chars': 'd', 'label': 'd'},
+    {'from': 7, 'to': 8, 'chars': 'w', 'label': 'w'},
+    {'from': 7, 'to': 14, 'chars': 'r', 'label': 'r'},
+    {'from': 7, 'to': 17, 'chars': 'n', 'label': 'n'},
+    {'from': 7, 'to': 19, 'chars': 's', 'label': 's'},
+    {'from': 7, 'to': 22, 'chars': 'oimehalq', 'label': 'oimehalq'},
+]
+
+operators_transitions = [
+    {'from': 0, 'to': 1, 'chars': 'i', 'label': 'i'},
+    {'from': 1, 'to': 2, 'chars': 'n', 'label': 'n'},
+    {'from': 2, 'to': 5, 'chars': 'c', 'label': 'c'},
+    {'from': 5, 'to': 6, 'chars': 'f', 'label': 'f'},
+    {'from': 0, 'to': 3, 'chars': 'd', 'label': 'd'},
+    {'from': 3, 'to': 4, 'chars': 'e', 'label': 'e'},
+    {'from': 4, 'to': 5, 'chars': 'c', 'label': 'c'},
+    {'from': 0, 'to': 7, 'chars': 'm', 'label': 'm'},
+    {'from': 7, 'to': 8, 'chars': 'o', 'label': 'o'},
+    {'from': 8, 'to': 6, 'chars': 'd', 'label': 'd'},
+    {'from': 0, 'to': 9, 'chars': 'r', 'label': 'r'},
+    {'from': 0, 'to': 10, 'chars': 'e', 'label': 'e'},
+    {'from': 10, 'to': 6, 'chars': 'm', 'label': 'm'},
+    {'from': 0, 'to': 6, 'chars': '+-*/=><', 'label': '+-*/=><'},
+    {'from': 0, 'to': 11, 'chars': 'oencf', 'label': 'oencf'},
+    {'from': 1, 'to': 11, 'chars': '+-*/<=>modreicf', 'label': '+-*/<=>modreicf'},
+    {'from': 2, 'to': 11, 'chars': '+-*/<=>modreinf', 'label': '+-*/<=>modreinf'},
+    {'from': 3, 'to': 11, 'chars': '+-*/<=>modrincf', 'label': '+-*/<=>modrincf'},
+    {'from': 4, 'to': 11, 'chars': '+-*/<=>modreinf', 'label': '+-*/<=>modreinf'},
+    {'from': 5, 'to': 11, 'chars': '+-*/<=>modreinc', 'label': '+-*/<=>modreinc'},
+    {'from': 7, 'to': 11, 'chars': '+-*/<=>mdreincf', 'label': '+-*/<=>mdreincf'},
+    {'from': 8, 'to': 11, 'chars': '+-*/<=>moreincf', 'label': '+-*/<=>moreincf'},
+    {'from': 9, 'to': 11, 'chars': '+-*/<=>modrincf', 'label': '+-*/<=>modrincf'},
+    {'from': 10, 'to': 11, 'chars': '+-*/<=>odreincf', 'label': '+-*/<=>odreincf'},
+    {'from': 11, 'to': 11, 'chars': '+-*/<=>modreincf', 'label': '+-*/<=>modreincf'},
+    {'from': 6, 'to': 1, 'chars': 'i', 'label': 'i'},
+    {'from': 6, 'to': 3, 'chars': 'd', 'label': 'd'},
+    {'from': 6, 'to': 7, 'chars': 'm', 'label': 'm'},
+    {'from': 6, 'to': 9, 'chars': 'r', 'label': 'r'},
+    {'from': 6, 'to': 6, 'chars': '+-*/<=>', 'label': '+-*/<=>'},
+    {'from': 6, 'to': 11, 'chars': 'oencf', 'label': 'oencf'},
+
+]
+
+constant_dfa = graphviz.Digraph('G', filename='constant')
+identifier_dfa = graphviz.Digraph('g', filename='identifier')
+string_dfa = graphviz.Digraph('s', filename='string')
+keywords_dfa = graphviz.Digraph('k', filename='keyword')
+operators_dfa = graphviz.Digraph('o', filename='operator')
+
+
+keywords_dfa.attr(size = '13,9.5', rankdir= 'LR', ranksep='0.05', nodesep='0.2')
+operators_dfa.attr(size = '13,9.5', rankdir= 'LR', ranksep='0.05', nodesep='0.2')
+
+#  constant dfa
+const_accept_states = [1, 3]
+const_reject_states = [4]
+
+# identifier dfa
+iden_accept_states = [1]
+iden_reject_states = [2]
+
+# string dfa
+str_accpet_states = [2]
+str_reject_states = [3]
+
+# keywords dfa
+key_accpet_states = [7]
+key_reject_states = [22]
+
+# operator dfa
+op_accpet_states = [6]
+op_reject_states = [11]
 
 def tokenize(text):
     text = text.lower()  # because lisp is case-insensitive
@@ -179,14 +375,186 @@ def check_end(idx, text):
     return False
 
 
-def main():
-    s = """x<= x <= 5 <=6 +4 3+3
-     )(!@ 12.34(read f 11x) ("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 111x )\n (write n) (write (* n n)) \"this is a string\" \n (setq x 10)
-    \n (> A B) \n (setq 54ght $d) 106t8 ) 12.34 mod /+ 3 44 +5 (* 2 3) 6dr f iden
-    """
-    tokenize(s)
+def create_dfa(wanted_dfa, wanted_transitions, accept_states, reject_states, st):
+    start_state = 0
+    wanted_dfa.node(st, shape='rectangle', label="token", labelloc='top', labeljust='center')
+
+    for state in range(max(t['to'] for t in wanted_transitions) + 1):
+        shape = 'circle'
+        st = str(state)
+        color = ''
+        style = ''
+        if state in accept_states:
+            shape = 'doublecircle'
+        elif state in reject_states:
+            color = 'red'
+            style = "filled"
+        wanted_dfa.node(st, shape=shape, fillcolor=color, style=style)
+
+    for t in wanted_transitions:
+        label = '[' + t['label'] + ']'
+        wanted_dfa.edge(str(t['from']), str(t['to']), label=label)
+
+
+DFA = None
+node_colors = {'0': 'white', '1': 'white', '2': 'white','3': 'white','4': 'red'}
+
+def get_dfa(t_type):
+
+    if t_type == TokenType.Number:
+        DFA = constant_dfa
+        node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'red'}
+        Transisions = Constant_transitions
+        label_node = '5'
+    elif t_type == TokenType.Identifier:
+        DFA = identifier_dfa
+        node_colors = {'0': 'white', '1': 'white', '2': 'red'}
+        Transisions = identifiers_transitions
+        label_node = '3'
+    elif t_type == TokenType.String:
+        DFA = string_dfa
+        node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'red'}
+        Transisions = string_transitions
+        label_node = '4'
+    elif t_type in keywords_tokenType:
+        DFA = keywords_dfa
+        node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'white', '5': 'white',
+                       '6': 'white', '7': 'white', '8': 'white', '9': 'white', '10': 'white', '11': 'white',
+                       '12': 'white', '13': 'white', '14': 'white', '15': 'white', '16': 'white', '17': 'white',
+                       '18': 'white', '19': 'white', '20': 'white', '21': 'white', '22': 'red'}
+        Transisions = keywords_transition
+        label_node = '23'
+    elif t_type in operators_tokenType:
+        DFA = operators_dfa
+        node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'white', '5': 'white',
+                       '6': 'white', '7': 'white', '8': 'white', '9': 'white', '10': 'white', '11': 'red'}
+        Transisions = operators_transitions
+        label_node = '12'
+    else:
+        DFA = operators_dfa
+        node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'white', '5': 'white',
+                       '6': 'white', '7': 'white', '8': 'white', '9': 'white', '10': 'white', '11': 'red'}
+        Transisions = operators_transitions
+        label_node = '12'
+    return DFA, node_colors, Transisions, label_node
+
+frames = []
+def update(frame):
+    frames.clear()
+    for token in Tokens:
+        DFA, node_colors, Transisions, label_node = get_dfa(token.token_type)
+        start_state = 0
+        current_state = start_state
+        for state, color in node_colors.items():
+            DFA.node(state, fillcolor=color, style='filled')
+        chars = token.lex
+        DFA.node(label_node,shape = 'rectangle',label = str(chars))
+        for char in chars:
+            print(char)
+            next_state = None
+            for transition in Transisions:
+                if transition['from'] == current_state and char in transition['chars']:
+                    next_state = transition['to']
+                    break
+
+            if next_state is None:
+                break
+
+            node_colors[str(current_state)] = 'lightgrey'
+            node_colors[str(next_state)] = 'lightblue'
+
+            current_state = next_state
+
+            for state, color in node_colors.items():
+                DFA.node(state, fillcolor=color,style='filled')
+            img = DFA.render(format='png')
+            im = imageio.v2.imread(img)
+            frames.append(im)
+
+    return frames
+
+root = tk.Tk()
+root.title("Tokenize Input")
+
+input_label = tk.Label(root, text="Enter Input:")
+input_label.pack()
+
+input_box = tk.Text(root, height=8, width=50)
+input_box.pack()
+
+animation_label = None
+
+already_pressed = False
+
+def scan():
+    global already_pressed, frames
+
+    text = input_box.get("1.0", "end-1c")
+    tokenize(text)
     for t in Tokens:
         print(t.lex, ",", t.token_type)
+    update(0)
+    max_shape = np.array(frames[0].shape)
+    for frame in frames:
+        shape = np.array(frame.shape)
+        max_shape = np.maximum(max_shape, shape)
+
+    combined_frames = np.zeros((len(frames), *max_shape[:2], 4), dtype=np.uint8)
+
+    for i, frame in enumerate(frames):
+        combined_frames[i, :frame.shape[0], :frame.shape[1], :3] = frame[..., :3]
+        combined_frames[i, :frame.shape[0], :frame.shape[1], 3] = 255
+
+    combined_frames = combined_frames[..., :3]
+    imageio.mimsave('new.gif', combined_frames, format='GIF', duration=1000)
+    time.sleep(0.5)
+    Tokens.clear()
+    display_animation()
+
+def display_animation():
+    global animation_label, already_pressed, frames
+    if already_pressed:
+        animation_label.destroy()
+    animation_label = tk.Label(root, text="Animation")
+    animation_label.pack()
+
+    photo_images = []
+    for i, frame in enumerate(frames):
+        image = Image.fromarray(frame)
+        photo_image = ImageTk.PhotoImage(image)
+        photo_images.append(photo_image)
+
+    try:
+        current_frame = tk.Label(animation_label, image=photo_images[0])
+        current_frame.pack()
+    except Exception:
+        pass
+
+    def update_image(index):
+        try:
+            current_frame.configure(image=photo_images[index])
+            index = (index + 1) % len(photo_images)
+            root.after(1000, update_image, index)
+        except Exception:
+            pass
+
+    root.after(0, update_image, 1)
+    already_pressed = True
+
+tokenize_button = tk.Button(root, text="Tokenize Input", command=scan)
+tokenize_button.pack()
+
+create_dfa(constant_dfa, Constant_transitions, const_accept_states, const_reject_states, '5')
+create_dfa(identifier_dfa, identifiers_transitions, iden_accept_states, iden_reject_states, '3')
+create_dfa(string_dfa, string_transitions, str_accpet_states, str_reject_states, '4')
+create_dfa(keywords_dfa, keywords_transition, key_accpet_states, key_reject_states, '23')
+create_dfa(operators_dfa, operators_transitions, op_accpet_states, op_reject_states, '12')
+
+# root.mainloop()
+
+
+def main():
+    root.mainloop()
 
 
 if __name__ == "__main__":
