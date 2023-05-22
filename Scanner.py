@@ -33,10 +33,13 @@ class TokenType(Enum):  # listing all tokens type
 
     # Other
     String = 22
-    Function = 23
+    Setq = 23
     Error = 24
     Number = 25
     Identifier = 26
+    Cos = 27
+    Sin = 28
+    Tan = 29
 
 
 # class token to hold string and token type
@@ -59,9 +62,12 @@ Keywords = {"(": TokenType.OpenParenthesis,
             "when": TokenType.When,
             "read": TokenType.Read,
             "write": TokenType.Write,
-            "t": TokenType.LogicalTrue,
             "nil": TokenType.LogicalFalse,
-            "setq": TokenType.Function
+            "setq": TokenType.Setq,
+            "cos": TokenType.Cos,
+            "tan": TokenType.Tan,
+            "t": TokenType.LogicalTrue,
+            "sin": TokenType.Sin
             }
 
 Operators = {";": TokenType.Semicolon,
@@ -180,9 +186,9 @@ def check_end(idx, text):
 
 
 def main():
-    s = """x<= x <= 5 <=6 +4 3+3
+    s = """tan x<= x <= 5 <=6 +4 3+3
      )(!@ 12.34(read f 11x) ("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 111x )\n (write n) (write (* n n)) \"this is a string\" \n (setq x 10)
-    \n (> A B) \n (setq 54ght $d) 106t8 ) 12.34 mod /+ 3 44 +5 (* 2 3) 6dr f iden
+    \n (> A B) \n (setq 54ght $d) 106t8 ) 12.34 mod /+ 3 44 +5 (* 2 3) 6dr f iden sin 3 cos f + tan 43 setq sin cos tan t when read write dotimes
     """
     tokenize(s)
     for t in Tokens:
