@@ -33,11 +33,10 @@ class TokenType(Enum):  # listing all tokens type
 
     # Other
     String = 22
-    Sympol = 23
-    Function = 24
-    Error = 25
-    Number = 26
-    Identifier = 27
+    Function = 23
+    Error = 24
+    Number = 25
+    Identifier = 26
 
 
 # class token to hold string and token type
@@ -90,7 +89,7 @@ def tokenize(text):
 
     constants_regex = r"[0-9]+(\.[0-9]*)?"
 
-    lisp_identifier_regex = r'[A-Za-z\*\+\-\/<=>&][\w\*\+\-\/<=>&]*'
+    lisp_identifier_regex = r'[a-zA-Z][a-zA-Z0-9]*'
     while text:
         # ignore whitespace
         if text[0].isspace():
@@ -130,37 +129,31 @@ def tokenize(text):
         if not text: break
         # search for reserved words
         keyword_match = re.match(keywords_regex, text)
-        if keyword_match and (text[keyword_match.end()] == ' ' or text[keyword_match.end()] == ')'):
+        if keyword_match and check_end(keyword_match.end(), text):
             Tokens.append(Token(keyword_match.group(), Keywords[keyword_match.group()]))
             text = text[keyword_match.end():]
-            continue
-
-        # search for constants
-        constant_match = re.match(constants_regex, text)
-        if constant_match and (constant_match.end() >= len(text) or text[constant_match.end()] == ' ' or text[constant_match.end()] == '('
-                or text[constant_match.end()] == ')' or text[constant_match.end()] == '\n'):
-            Tokens.append(Token(constant_match.group(), TokenType.Number))
-            text = text[constant_match.end():]
-            continue
-
-        # search for identifiers
-        identifier_match = re.match(lisp_identifier_regex, text)
-        if identifier_match:
-            word = identifier_match.group()
-            temp = re.findall("\w|\d", word)
-            if len(temp) == 0:
-                Tokens.append(Token(identifier_match.group(), TokenType.Sympol))
-            else:
-                Tokens.append(Token(identifier_match.group(), TokenType.Identifier))
-            text = text[identifier_match.end():]
             continue
 
         # search for Ops
 
         op_match = re.match(operators_regex, text)
-        if op_match:
+        if op_match and check_end(op_match.end(), text):
             Tokens.append(Token(op_match.group(), Operators[op_match.group()]))
             text = text[op_match.end():]
+            continue
+
+        # search for identifiers
+        identifier_match = re.match(lisp_identifier_regex, text)
+        if identifier_match and check_end(identifier_match.end(), text):
+            Tokens.append(Token(identifier_match.group(), TokenType.Identifier))
+            text = text[identifier_match.end():]
+            continue
+
+        # search for constants
+        constant_match = re.match(constants_regex, text)
+        if constant_match and check_end(constant_match.end(), text):
+            Tokens.append(Token(constant_match.group(), TokenType.Number))
+            text = text[constant_match.end():]
             continue
 
         # invalid token
@@ -178,9 +171,18 @@ def tokenize(text):
             text = text[jump:]
 
 
+def check_end(idx, text):
+    if (idx >= len(text) or text[idx] == ' ' or text[
+        idx] == '('
+            or text[idx] == ')' or text[idx] == '\n'):
+        return True
+    return False
+
+
 def main():
-    s = """)(!@ 12.34(read 11x) ("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 111x )\n (write n) (write (* n n)) \"this is a string\" \n (setq x 10)
-        \n (> A B) \n (setq 54ght $d) 106t8 ) 12.34
+    s = """x<= x <= 5 <=6 +4 3+3
+     )(!@ 12.34(read f 11x) ("ah;med");vsvR \n(nil)\n("";) \n (dotimes (n 111x )\n (write n) (write (* n n)) \"this is a string\" \n (setq x 10)
+    \n (> A B) \n (setq 54ght $d) 106t8 ) 12.34 mod /+ 3 44 +5 (* 2 3) 6dr f iden
     """
     tokenize(s)
     for t in Tokens:
