@@ -527,7 +527,7 @@ root.title("Tokenize Input")
 input_label = tk.Label(root, text="Enter Input:", bg = 'white')
 input_label.pack()
 
-input_box = tk.Text(root, height=8, width=50, bg = 'lightgray')
+input_box = tk.Text(root, height=6, width=50, bg = 'lightgray')
 input_box.pack()
 
 animation_label = None
@@ -556,7 +556,6 @@ def scan():
 
     combined_frames = combined_frames[..., :3]
     imageio.mimsave('new.gif', combined_frames, format='GIF', duration=1000)
-    time.sleep(0.5)
     Tokens.clear()
     display_animation()
 
