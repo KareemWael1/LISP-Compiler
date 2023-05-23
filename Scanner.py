@@ -474,13 +474,11 @@ def get_dfa(t_type):
         Transisions = operators_transitions
         label_node = '12'
     else:
-        DFA = operators_dfa
-        node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'white', '5': 'white',
-                       '6': 'white', '7': 'white', '8': 'white', '9': 'white', '10': 'white', '11': 'red'}
-        Transisions = operators_transitions
-        label_node = '12'
+        DFA = None
+        node_colors = None
+        Transisions = None
+        label_node = None
     return DFA, node_colors, Transisions, label_node
-
 
 frames = []
 
@@ -489,6 +487,8 @@ def update(frame):
     frames.clear()
     for token in Tokens:
         DFA, node_colors, Transisions, label_node = get_dfa(token.token_type)
+        if DFA == None:
+            break
         start_state = 0
         current_state = start_state
         for state, color in node_colors.items():
