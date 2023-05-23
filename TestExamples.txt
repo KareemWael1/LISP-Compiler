@@ -2,4 +2,8 @@
 
 (dotimes (n 11)(write n) (write (* n n))
 
+(< x 6) (> x 6) (<> x 6)
+
+(setq x 5
+
 (+ x y)(setq 8 5)(- u v)

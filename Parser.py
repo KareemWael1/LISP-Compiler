@@ -158,16 +158,23 @@ def Function(ind):
 
 
 def UnaryFunction(ind):
-    productions = [UnaryFunctionName, Value]
-    return rule(productions, ind, "UnaryFunction")
+    out = {}
+    if lookahead([Scanner.TokenType.Write, Scanner.TokenType.Sin, Scanner.TokenType.Cos, Scanner.TokenType.Tan], ind):
+        productions = [UnaryFunctionName, Value]
+        return rule(productions, ind, "UnaryFunction")
+    elif lookahead([Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp], ind):
+        productions = [UnaryOperator, Scanner.TokenType.Identifier]
+        return rule(productions, ind, "UnaryFunction")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
 
 
 def UnaryFunctionName(ind):
     out = {}
-    if lookahead([Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp], ind):
-        productions = [UnaryOperator]
-        return rule(productions, ind, "UnaryFunctionName")
-    elif Match(Scanner.TokenType.Write, ind, False)["node"] != ["error"]:
+    if Match(Scanner.TokenType.Write, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Write]
         return rule(productions, ind, "UnaryFunctionName")
     elif Match(Scanner.TokenType.Sin, ind, False)["node"] != ["error"]:
