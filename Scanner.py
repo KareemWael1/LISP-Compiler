@@ -20,35 +20,34 @@ class TokenType(Enum):  # listing all tokens type
     When = 4
     Read = 5
     Write = 6
-    LogicalTrue = 7
-    LogicalFalse = 8
+    Setq = 7
+    Cos = 8
+    Sin = 9
+    Tan = 10
+    LogicalTrue = 11
+    LogicalFalse = 12
 
     # Operators
-    Semicolon = 9
-    PlusOp = 10
-    MinusOp = 11
-    MultiplyOp = 12
-    DivideOp = 13
-    ModOp = 14
-    RemOp = 15
-    IncrementOp = 16
-    DecrementOp = 17
-    GreaterThanOrEqualOp = 18
-    LessThanOrEqualOp = 19
-    EqualOp = 20
-    NotEqualOp = 21
+    PlusOp = 14
+    MinusOp = 15
+    MultiplyOp = 16
+    DivideOp = 17
+    ModOp = 18
+    RemOp = 19
+    IncrementOp = 20
+    DecrementOp = 21
+    GreaterThanOrEqualOp = 22
+    LessThanOrEqualOp = 23
+    GreaterThanOp = 25
+    LessThanOp = 24
+    EqualOp = 26
+    NotEqualOp = 27
 
     # Other
-    String = 22
-    Setq = 23
-    Error = 24
-    Number = 25
-    Identifier = 26
-    Cos = 27
-    Sin = 28
-    Tan = 29
-    LessThan = 30
-    GreaterThan = 31
+    String = 28
+    Number = 29
+    Identifier = 30
+    Error = 31
 
 
 # class token to hold string and token type
@@ -79,8 +78,7 @@ Keywords = {"(": TokenType.OpenParenthesis,
             "sin": TokenType.Sin
             }
 
-Operators = {";": TokenType.Semicolon,
-             "+": TokenType.PlusOp,
+Operators = {"+": TokenType.PlusOp,
              "-": TokenType.MinusOp,
              "*": TokenType.MultiplyOp,
              "/": TokenType.DivideOp,
@@ -92,8 +90,8 @@ Operators = {";": TokenType.Semicolon,
              ">=": TokenType.GreaterThanOrEqualOp,
              "=": TokenType.EqualOp,
              "<>": TokenType.NotEqualOp,
-             "<": TokenType.LessThan,
-             ">": TokenType.GreaterThan
+             "<": TokenType.LessThanOp,
+             ">": TokenType.GreaterThanOp
              }
 
 Tokens = []  # to add tokens to list
@@ -112,8 +110,7 @@ keywords_tokenType = [TokenType.OpenParenthesis,
                       TokenType.Setq
                       ]
 
-operators_tokenType = [TokenType.Semicolon,
-                       TokenType.PlusOp,
+operators_tokenType = [TokenType.PlusOp,
                        TokenType.MinusOp,
                        TokenType.MultiplyOp,
                        TokenType.DivideOp,
@@ -125,8 +122,8 @@ operators_tokenType = [TokenType.Semicolon,
                        TokenType.GreaterThanOrEqualOp,
                        TokenType.EqualOp,
                        TokenType.NotEqualOp,
-                       TokenType.LessThan,
-                       TokenType.GreaterThan]
+                       TokenType.LessThanOp,
+                       TokenType.GreaterThanOp]
 
 input_chars = {
     'letter': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
