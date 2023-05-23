@@ -441,6 +441,8 @@ def Match(a, j, report=True):
     else:
         output["node"] = ["error"]
         output["index"] = j
+        if report:
+            errors.append("Syntax error : " + F" Expected {a}")
         return output
 
 
