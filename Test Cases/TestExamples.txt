@@ -4,6 +4,8 @@
 
 (< x 6) (> x 6) (<> x 6)
 
+Error:
+
 (setq x 5
 
 (+ x y)(setq 8 5)(- u v)

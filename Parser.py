@@ -373,7 +373,7 @@ def is_error(arr):
     return 'mode' in arr[-1].keys() and arr[-1]['mode'] == ['error']
 
 
-def match_entity(arr, match, position, j):
+def match_production(arr, match, position, j):
     if callable(match):
         if position == 0:
             arr.append(match(j))
@@ -401,7 +401,7 @@ def rule(productions, ind, func_name):
     i = 0
     while i < len(productions):
         match = productions[i]
-        arr = match_entity(arr, match, i, ind)
+        arr = match_production(arr, match, i, ind)
         ind = arr[-1]["index"]
         children.append(arr[-1]["node"])
         if is_error(arr):
