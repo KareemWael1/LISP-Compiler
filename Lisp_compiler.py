@@ -4,9 +4,11 @@ import graphviz
 import time
 import imageio
 from PIL import Image, ImageTk
-import pandas as pd
 import numpy as np
 import tkinter as tk
+import pandas
+import pandastable as pt
+from nltk.tree import *
 
 
 class TokenType(Enum):  # listing all tokens type
@@ -527,7 +529,7 @@ root.title("Tokenize Input")
 input_label = tk.Label(root, text="Enter Input:", bg = 'white')
 input_label.pack()
 
-input_box = tk.Text(root, height=8, width=50, bg = 'lightgray')
+input_box = tk.Text(root, height=6, width=50, bg = 'lightgray')
 input_box.pack()
 
 animation_label = None
@@ -592,7 +594,8 @@ def display_animation():
     already_pressed = True
 
 
-tokenize_button = tk.Button(root, text="Tokenize Input", command=scan, bg = 'lightblue')
+tokenize_button = tk.Button(root, text="Tokenize Input", command=scan, bg = 'lightblue', width=12)
+# tokenize_button.place(x=800, y=160)
 tokenize_button.pack()
 
 create_dfa(constant_dfa, Constant_transitions, const_accept_states, const_reject_states, '5')
@@ -604,7 +607,475 @@ create_dfa(operators_dfa, operators_transitions, op_accpet_states, op_reject_sta
 
 # root.mainloop()
 
+errors = []
 
+
+def Program(ind):
+    productions = [Lists]
+    return rule(productions, ind, "Program")["node"]
+
+
+def Lists(ind):
+    productions = [List, Lists_dash]
+    return rule(productions, ind, "Lists")
+
+
+def Lists_dash(ind):
+    out = {}
+    if Match(TokenType.OpenParenthesis, ind, False)["node"] != ["error"]:
+        productions = [List, Lists_dash]
+        return rule(productions, ind, "Lists`")
+    else:
+        out["node"] = Tree("Lists`", ["ε"])
+        out["index"] = ind
+        return out
+
+
+def List(ind):
+    productions = [TokenType.OpenParenthesis, Contents, TokenType.CloseParenthesis]
+    return rule(productions, ind, "List")
+
+
+def Contents(ind):
+    productions = [Content, Contents_dash]
+    return rule(productions, ind, "Contents")
+
+
+def Contents_dash(ind):
+    out = {}
+    if lookahead([TokenType.OpenParenthesis, TokenType.Dotimes, TokenType.When,
+                  TokenType.IncrementOp, TokenType.DecrementOp, TokenType.Write,
+                  TokenType.Sin, TokenType.Cos, TokenType.Tan,
+                  TokenType.Setq, TokenType.PlusOp, TokenType.MinusOp,
+                  TokenType.MultiplyOp, TokenType.DivideOp, TokenType.ModOp,
+                  TokenType.RemOp, TokenType.GreaterThanOrEqualOp, TokenType.LessThanOrEqualOp,
+                  TokenType.GreaterThanOp, TokenType.LessThanOp, TokenType.EqualOp,
+                  TokenType.NotEqualOp, TokenType.Identifier, TokenType.Read,
+                  TokenType.LogicalTrue, TokenType.LogicalFalse], ind):
+        productions = [Content, Contents_dash]
+        return rule(productions, ind, "Contents`")
+    else:
+        out["node"] = Tree("Contents`", ["ε"])
+        out["index"] = ind
+        return out
+
+
+def Content(ind):
+    out = {}
+    if Match(TokenType.OpenParenthesis, ind, False)["node"] != ["error"]:
+        productions = [List]
+        return rule(productions, ind, "Content")
+    elif lookahead([TokenType.Dotimes, TokenType.When], ind):
+        productions = [Block]
+        return rule(productions, ind, "Content")
+    elif lookahead([TokenType.IncrementOp, TokenType.DecrementOp, TokenType.Write,
+                    TokenType.Sin, TokenType.Cos,
+                    TokenType.Tan, TokenType.Setq, TokenType.PlusOp, TokenType.MinusOp,
+                    TokenType.MultiplyOp,
+                    TokenType.DivideOp, TokenType.ModOp, TokenType.RemOp,
+                    TokenType.GreaterThanOrEqualOp,
+                    TokenType.LessThanOrEqualOp, TokenType.GreaterThanOp, TokenType.LessThanOp,
+                    TokenType.EqualOp,
+                    TokenType.NotEqualOp, TokenType.Identifier, TokenType.Read,
+                    TokenType.LogicalTrue,
+                    TokenType.LogicalFalse], ind):
+        productions = [Expression]
+        return rule(productions, ind, "Content")
+    else:
+        out["node"] = Tree("Content", ["ε"])
+        out["index"] = ind
+        return out
+
+
+def Block(ind):
+    out = {}
+    if Match(TokenType.Dotimes, ind, False)["node"] != ["error"]:
+        productions = [TokenType.Dotimes, TokenType.OpenParenthesis, TokenType.Identifier,
+                       TokenType.Number, TokenType.CloseParenthesis, Lists]
+        return rule(productions, ind, "Block")
+    elif Match(TokenType.When, ind, False)["node"] != ["error"]:
+        productions = [TokenType.When, TokenType.OpenParenthesis, Expression,
+                       TokenType.CloseParenthesis, Lists]
+        return rule(productions, ind, "Block")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def Expression(ind):
+    out = {}
+    if lookahead([TokenType.IncrementOp, TokenType.DecrementOp, TokenType.Write,
+                  TokenType.Sin, TokenType.Cos,
+                  TokenType.Tan, TokenType.Setq, TokenType.PlusOp, TokenType.MinusOp,
+                  TokenType.MultiplyOp,
+                  TokenType.DivideOp, TokenType.ModOp, TokenType.RemOp,
+                  TokenType.GreaterThanOrEqualOp,
+                  TokenType.LessThanOrEqualOp, TokenType.GreaterThanOp, TokenType.LessThanOp,
+                  TokenType.EqualOp,
+                  TokenType.NotEqualOp, TokenType.Identifier, TokenType.Read], ind):
+        productions = [Function]
+        return rule(productions, ind, "Expression")
+    elif Match(TokenType.LogicalTrue, ind, False)["node"] != ["error"]:
+        productions = [TokenType.LogicalTrue]
+        return rule(productions, ind, "Expression")
+    elif Match(TokenType.LogicalFalse, ind, False)["node"] != ["error"]:
+        productions = [TokenType.LogicalFalse]
+        return rule(productions, ind, "Expression")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def Function(ind):
+    out = {}
+    if lookahead([TokenType.IncrementOp, TokenType.DecrementOp, TokenType.Write,
+                  TokenType.Sin, TokenType.Cos,
+                  TokenType.Tan], ind):
+        productions = [UnaryFunction]
+        return rule(productions, ind, "Function")
+    elif lookahead(
+            [TokenType.Setq, TokenType.PlusOp, TokenType.MinusOp, TokenType.MultiplyOp,
+             TokenType.DivideOp,
+             TokenType.ModOp, TokenType.RemOp, TokenType.GreaterThanOrEqualOp,
+             TokenType.LessThanOrEqualOp,
+             TokenType.GreaterThanOp, TokenType.LessThanOp, TokenType.EqualOp,
+             TokenType.NotEqualOp], ind):
+        productions = [BinaryFunction]
+        return rule(productions, ind, "Function")
+    elif Match(TokenType.Identifier, ind, False)["node"] != ["error"]:
+        productions = [OtherFunction]
+        return rule(productions, ind, "Function")
+    elif Match(TokenType.Read, ind, False)["node"] != ["error"]:
+        productions = [TokenType.Read]
+        return rule(productions, ind, "Function")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def UnaryFunction(ind):
+    out = {}
+    if lookahead([TokenType.Write, TokenType.Sin, TokenType.Cos, TokenType.Tan], ind):
+        productions = [UnaryFunctionName, Value]
+        return rule(productions, ind, "UnaryFunction")
+    elif lookahead([TokenType.IncrementOp, TokenType.DecrementOp], ind):
+        productions = [UnaryOperator, TokenType.Identifier]
+        return rule(productions, ind, "UnaryFunction")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def UnaryFunctionName(ind):
+    out = {}
+    if Match(TokenType.Write, ind, False)["node"] != ["error"]:
+        productions = [TokenType.Write]
+        return rule(productions, ind, "UnaryFunctionName")
+    elif Match(TokenType.Sin, ind, False)["node"] != ["error"]:
+        productions = [TokenType.Sin]
+        return rule(productions, ind, "UnaryFunctionName")
+    elif Match(TokenType.Cos, ind, False)["node"] != ["error"]:
+        productions = [TokenType.Cos]
+        return rule(productions, ind, "UnaryFunctionName")
+    elif Match(TokenType.Tan, ind, False)["node"] != ["error"]:
+        productions = [TokenType.Tan]
+        return rule(productions, ind, "UnaryFunctionName")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def BinaryFunction(ind):
+    out = {}
+    if Match(TokenType.Setq, ind, False)["node"] != ["error"]:
+        productions = [SetqFunction]
+        return rule(productions, ind, "BinaryFunction")
+    elif lookahead([TokenType.PlusOp, TokenType.MinusOp, TokenType.MultiplyOp,
+                    TokenType.DivideOp, TokenType.ModOp,
+                    TokenType.RemOp, TokenType.GreaterThanOrEqualOp,
+                    TokenType.LessThanOrEqualOp,
+                    TokenType.GreaterThanOp, TokenType.LessThanOp, TokenType.EqualOp,
+                    TokenType.NotEqualOp], ind):
+        productions = [BinaryOperatorFunction]
+        return rule(productions, ind, "BinaryFunction")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def SetqFunction(ind):
+    productions = [TokenType.Setq, TokenType.Identifier, Value]
+    return rule(productions, ind, "SetqFunction")
+
+
+def BinaryOperatorFunction(ind):
+    productions = [BinaryOperator, Value, Value]
+    return rule(productions, ind, "BinaryOperatorFunction")
+
+
+def OtherFunction(ind):
+    productions = [TokenType.Identifier, Parameters]
+    return rule(productions, ind, "OtherFunction")
+
+
+def UnaryOperator(ind):
+    out = {}
+    if Match(TokenType.IncrementOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.IncrementOp]
+        return rule(productions, ind, "UnaryOperator")
+    elif Match(TokenType.DecrementOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.DecrementOp]
+        return rule(productions, ind, "UnaryOperator")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def BinaryOperator(ind):
+    out = {}
+    if Match(TokenType.PlusOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.PlusOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.MinusOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.MinusOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.MultiplyOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.MultiplyOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.DivideOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.DivideOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.ModOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.ModOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.RemOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.RemOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.GreaterThanOrEqualOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.GreaterThanOrEqualOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.LessThanOrEqualOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.LessThanOrEqualOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.GreaterThanOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.GreaterThanOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.LessThanOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.LessThanOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.EqualOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.EqualOp]
+        return rule(productions, ind, "BinaryOperator")
+    elif Match(TokenType.NotEqualOp, ind, False)["node"] != ["error"]:
+        productions = [TokenType.NotEqualOp]
+        return rule(productions, ind, "BinaryOperator")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def Parameters(ind):
+    out = {}
+    if lookahead([TokenType.Identifier, TokenType.Number, TokenType.IncrementOp,
+                  TokenType.DecrementOp, TokenType.Write,
+                  TokenType.Sin, TokenType.Cos, TokenType.Tan, TokenType.Setq,
+                  TokenType.PlusOp, TokenType.MinusOp,
+                  TokenType.MultiplyOp, TokenType.DivideOp, TokenType.ModOp,
+                  TokenType.RemOp,
+                  TokenType.GreaterThanOrEqualOp, TokenType.LessThanOrEqualOp,
+                  TokenType.GreaterThanOp,
+                  TokenType.LessThanOp, TokenType.EqualOp, TokenType.NotEqualOp,
+                  TokenType.Identifier, TokenType.Read,
+                  TokenType.LogicalTrue, TokenType.LogicalFalse, TokenType.String], ind):
+        productions = [Value, Parameters_dash]
+        return rule(productions, ind, "Parameters")
+    else:
+        out["node"] = Tree("Parameters", ["ε"])
+        out["index"] = ind
+        return out
+
+
+def Parameters_dash(ind):
+    out = {}
+    if lookahead([TokenType.Identifier, TokenType.Number, TokenType.IncrementOp,
+                  TokenType.DecrementOp, TokenType.Write,
+                  TokenType.Sin, TokenType.Cos, TokenType.Tan, TokenType.Setq,
+                  TokenType.PlusOp, TokenType.MinusOp,
+                  TokenType.MultiplyOp, TokenType.DivideOp, TokenType.ModOp,
+                  TokenType.RemOp,
+                  TokenType.GreaterThanOrEqualOp, TokenType.LessThanOrEqualOp,
+                  TokenType.GreaterThanOp,
+                  TokenType.LessThanOp, TokenType.EqualOp, TokenType.NotEqualOp,
+                  TokenType.Identifier, TokenType.Read,
+                  TokenType.LogicalTrue, TokenType.LogicalFalse, TokenType.String], ind):
+        productions = [Value, Parameters_dash]
+        return rule(productions, ind, "Parameters`")
+    else:
+        out["node"] = Tree("Parameters`", ["ε"])
+        out["index"] = ind
+        return out
+
+
+def Value(ind):
+    out = {}
+    if lookahead([TokenType.Identifier, TokenType.Number], ind):
+        productions = [Atom]
+        return rule(productions, ind, "Value")
+    elif lookahead([TokenType.OpenParenthesis], ind):
+        productions = [TokenType.OpenParenthesis, Function, TokenType.CloseParenthesis]
+        return rule(productions, ind, "Value")
+    elif Match(TokenType.LogicalTrue, ind, False)["node"] != ["error"]:
+        productions = [TokenType.LogicalTrue]
+        return rule(productions, ind, "Value")
+    elif Match(TokenType.LogicalFalse, ind, False)["node"] != ["error"]:
+        productions = [TokenType.LogicalFalse]
+        return rule(productions, ind, "Value")
+    elif Match(TokenType.String, ind, False)["node"] != ["error"]:
+        productions = [TokenType.String]
+        return rule(productions, ind, "Value")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def Atom(ind):
+    out = {}
+    if Match(TokenType.Identifier, ind, False)["node"] != ["error"]:
+        productions = [TokenType.Identifier]
+        return rule(productions, ind, "Atom")
+    elif Match(TokenType.Number, ind, False)["node"] != ["error"]:
+        productions = [TokenType.Number]
+        return rule(productions, ind, "Atom")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def is_error(arr):
+    return 'mode' in arr[-1].keys() and arr[-1]['mode'] == ['error']
+
+
+def match_entity(arr, match, position, j):
+    if callable(match):
+        if position == 0:
+            arr.append(match(j))
+        else:
+            arr.append(match(arr[-1]['index']))
+    else:
+        if position == 0:
+            arr.append(Match(match, j))
+        else:
+            arr.append(Match(match, arr[-1]['index']))
+    return arr
+
+
+def lookahead(Arr, ind):
+    for i in Arr:
+        if Match(i, ind, False)["node"] != ["error"]:
+            return True
+    return False
+
+
+def rule(productions, ind, func_name):
+    arr = []
+    out = {}
+    children = []
+    i = 0
+    while i < len(productions):
+        match = productions[i]
+        arr = match_entity(arr, match, i, ind)
+        ind = arr[-1]["index"]
+        children.append(arr[-1]["node"])
+        if is_error(arr):
+            while ind < len(Tokens) and Tokens[ind].lex != ")":
+                ind += 1
+            arr[-1]["index"] = ind
+            if TokenType.CloseParenthesis in productions[i:]:
+                i = productions[i:].index(TokenType.CloseParenthesis) + i
+                continue
+            else:
+                out["mode"] = ["error"]
+                out["index"] = ind
+                out["node"] = Tree(func_name, children)
+                return out
+        ind += 1
+        i += 1
+    out["node"] = Tree(func_name, children)
+    out["index"] = arr[-1]["index"]
+    return out
+
+
+def Match(a, j, report=True):
+    output = dict()
+    if j < len(Tokens):
+        temp = Tokens[j].to_dict()
+        if temp["token_type"] == a:
+            output["node"] = [temp["Lex"]]
+            output["index"] = j + 1
+            return output
+        else:
+            output["mode"] = ["error"]
+            output["node"] = ["error"]
+            output["index"] = j
+            if report:
+                errors.append("Syntax error : " + temp["Lex"] + F" Expected {a}")
+            return output
+    else:
+        output["node"] = ["error"]
+        output["index"] = j
+        if report:
+            errors.append("Syntax error : " + F" Expected {a}")
+        return output
+
+
+
+def parse():
+    x1 = input_box.get("1.0", "end-1c")
+    tokenize(x1)
+    df = pandas.DataFrame.from_records([t.to_dict() for t in Tokens])
+    # print(df)
+
+    # to display token stream as table
+    d_t_da1 = tk.Toplevel()
+    d_t_da1.title('Token Stream')
+    d_t_da_pt = pt.Table(d_t_da1, dataframe=df, showtoolbar=True, showstatusbar=True)
+    d_t_da_pt.show()
+    # start Parsing
+    node = Program(0)
+
+    # to display error list
+
+    df1 = pandas.DataFrame(errors)
+    d_t_da2 = tk.Toplevel()
+    d_t_da2.title('Error List')
+    d_t_da_pt2 = pt.Table(d_t_da2, dataframe=df1, showtoolbar=True, showstatusbar=True)
+    d_t_da_pt2.show()
+
+    node.draw()
+
+parse_button = tk.Button(root, text="parse Input", command=parse, bg = 'lightblue', width=12)
+# parse_button.place(x=650, y=160)
+parse_button.pack()
 def main():
     root.mainloop()
 
