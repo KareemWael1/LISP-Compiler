@@ -30,13 +30,11 @@ def Lists_dash(ind):
 
 
 def List(ind):
-    out = {}
     matches = [Scanner.TokenType.OpenParenthesis, Contents, Scanner.TokenType.CloseParenthesis]
     return applyfills(matches, ind, "list")
 
 
 def Contents(ind):
-    out = {}
     matches = [Content, Contents_dash]
     return applyfills(matches, ind, "contents")
 
@@ -143,7 +141,6 @@ def Function(ind):
 
 
 def UnaryFunction(ind):
-    out = {}
     matches = [UnaryFunctionName, Value]
     return applyfills(matches, ind, "unaryfunction")
 
@@ -191,19 +188,16 @@ def BinaryFunction(ind):
 
 
 def SetqFunction(ind):
-    out = {}
     matches = [Scanner.TokenType.Setq, Scanner.TokenType.Identifier, Value]
     return applyfills(matches, ind, "setqfunction")
 
 
 def BinaryOperatorFunction(ind):
-    out = {}
     matches = [BinaryOperator, Value, Value]
     return applyfills(matches, ind, "binaryoperatorfunction")
 
 
 def OtherFunction(ind):
-    out = {}
     matches = [Scanner.TokenType.Identifier, Parameters]
     return applyfills(matches, ind, "otherfunction")
 
@@ -346,7 +340,7 @@ def is_there_error(arr):
 
 
 def fillmatch(arr, match, position, j):
-    if (callable(match)):
+    if callable(match):
         if position == 0:
             arr.append(match(j))
         else:
@@ -369,13 +363,13 @@ def MatchArr(Arr, ind, appendToError):
 def applyfills(matches, ind, func_name):
     arr = []
     out = {}
-    Children = []
+    children = []
     i = 0
     while i < len(matches):
         match = matches[i]
         arr = fillmatch(arr, match, i, ind)
         ind = arr[-1]["index"]
-        Children.append(arr[-1]["node"])
+        children.append(arr[-1]["node"])
         if is_there_error(arr):
             while ind < len(Scanner.Tokens) and Scanner.Tokens[ind].lex != ")":
                 ind += 1
@@ -386,12 +380,12 @@ def applyfills(matches, ind, func_name):
             else:
                 out["mode"] = ["error"]
                 out["index"] = ind
-                out["node"] = Tree(func_name, Children)
+                out["node"] = Tree(func_name, children)
                 return out
 
         ind += 1
         i += 1
-    out["node"] = Tree(func_name, Children)
+    out["node"] = Tree(func_name, children)
     out["index"] = arr[-1]["index"]
     return out
 
@@ -434,6 +428,7 @@ canvas1.create_window(200, 100, window=label2)
 entry1 = tk.Entry(root)
 canvas1.create_window(200, 140, window=entry1)
 
+
 def Scan():
     x1 = entry1.get()
     Scanner.tokenize(x1)
@@ -441,22 +436,22 @@ def Scan():
     # print(df)
 
     # to display token stream as table
-    dTDa1 = tk.Toplevel()
-    dTDa1.title('Token Stream')
-    dTDaPT = pt.Table(dTDa1, dataframe=df, showtoolbar=True, showstatusbar=True)
-    dTDaPT.show()
+    d_t_da1 = tk.Toplevel()
+    d_t_da1.title('Token Stream')
+    d_t_da_pt = pt.Table(d_t_da1, dataframe=df, showtoolbar=True, showstatusbar=True)
+    d_t_da_pt.show()
     # start Parsing
-    Node = Program(0)
+    node = Program(0)
 
     # to display error list
 
     df1 = pandas.DataFrame(errors)
-    dTDa2 = tk.Toplevel()
-    dTDa2.title('Error List')
-    dTDaPT2 = pt.Table(dTDa2, dataframe=df1, showtoolbar=True, showstatusbar=True)
-    dTDaPT2.show()
+    d_t_da2 = tk.Toplevel()
+    d_t_da2.title('Error List')
+    d_t_da_pt2 = pt.Table(d_t_da2, dataframe=df1, showtoolbar=True, showstatusbar=True)
+    d_t_da_pt2.show()
 
-    Node.draw()
+    node.draw()
 
 
 frame1 = tk.Frame(root)
