@@ -446,26 +446,8 @@ def Match(a, j, report=True):
         return output
 
 
-# GUI
-root = tk.Tk()
-
-canvas1 = tk.Canvas(root, width=400, height=300, relief='raised')
-canvas1.pack()
-
-label1 = tk.Label(root, text='Parser Phase')
-label1.config(font=('helvetica', 14))
-canvas1.create_window(200, 25, window=label1)
-
-label2 = tk.Label(root, text='Source code:')
-label2.config(font=('helvetica', 10))
-canvas1.create_window(200, 100, window=label2)
-
-entry1 = tk.Entry(root)
-canvas1.create_window(200, 140, width=300, window=entry1)
-
-
-def Scan():
-    x1 = entry1.get()
+def parse():
+    x1 = Scanner.input_box.get("1.0", "end-1c")
     Scanner.tokenize(x1)
     df = pandas.DataFrame.from_records([t.to_dict() for t in Scanner.Tokens])
     # print(df)
@@ -488,9 +470,3 @@ def Scan():
 
     node.draw()
 
-
-frame1 = tk.Frame(root)
-button1 = tk.Button(frame1, text='Scan', command=Scan, bg='brown', fg='white', font=('helvetica', 9, 'bold'))
-button1.pack()
-canvas1.create_window(200, 180, window=frame1)
-root.mainloop()

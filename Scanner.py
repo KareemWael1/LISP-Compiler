@@ -592,7 +592,7 @@ def display_animation():
     already_pressed = True
 
 
-tokenize_button = tk.Button(root, text="Tokenize Input", command=scan, bg = 'lightblue')
+tokenize_button = tk.Button(root, text="Tokenize Input", command=scan, bg = 'lightblue', width=12)
 tokenize_button.pack()
 
 create_dfa(constant_dfa, Constant_transitions, const_accept_states, const_reject_states, '5')
