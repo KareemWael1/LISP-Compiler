@@ -146,12 +146,12 @@ Constant_transitions = [
 ]
 
 identifiers_transitions = [
-    {'from': 0, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'],
-     'label': 'letter +-*/<=>&_'},
-    {'from': 0, 'to': 2, 'chars': input_chars['digit'] + input_chars['special_char'],
-     'label': 'digit special_character'},
+    {'from': 0, 'to': 1, 'chars': input_chars['letter'],
+     'label': 'letter'},
+    {'from': 0, 'to': 2, 'chars': input_chars['digit'] + input_chars['special_char'] + input_chars['identifier_operator'],
+     'label': 'digit special_character +-*/<=>&_'},
     {'from': 1, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'],
-     'label': 'letter +-*/<=>&_'},
+     'label': 'letter +-*/<=>&_ digit'},
     {'from': 1, 'to': 2, 'chars': input_chars['special_char'], 'label': 'special_character'},
     {'from': 2, 'to': 2,
      'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'] + input_chars[
