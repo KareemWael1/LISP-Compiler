@@ -35,18 +35,20 @@ class TokenType(Enum):  # listing all tokens type
     DecrementOp = 17
     GreaterThanOrEqualOp = 18
     LessThanOrEqualOp = 19
-    EqualOp = 20
-    NotEqualOp = 21
+    GreaterThanOp = 20
+    LessThanOp = 21
+    EqualOp = 22
+    NotEqualOp = 23
 
     # Other
-    String = 22
-    Setq = 23
-    Error = 24
-    Number = 25
-    Identifier = 26
-    Cos = 27
-    Sin = 28
-    Tan = 29
+    String = 24
+    Setq = 25
+    Error = 26
+    Number = 27
+    Identifier = 28
+    Cos = 29
+    Sin = 30
+    Tan = 31
 
 
 # class token to hold string and token type
@@ -102,7 +104,7 @@ keywords_tokenType = [TokenType.OpenParenthesis,
                       TokenType.Write,
                       TokenType.LogicalTrue,
                       TokenType.LogicalFalse,
-                      TokenType.Function]
+                      TokenType.Setq]
 
 operators_tokenType = [TokenType.Semicolon,
                        TokenType.PlusOp,
