@@ -35,20 +35,20 @@ class TokenType(Enum):  # listing all tokens type
     DecrementOp = 17
     GreaterThanOrEqualOp = 18
     LessThanOrEqualOp = 19
-    GreaterThanOp = 20
-    LessThanOp = 21
-    EqualOp = 22
-    NotEqualOp = 23
+    EqualOp = 20
+    NotEqualOp = 21
 
     # Other
-    String = 24
-    Setq = 25
-    Error = 26
-    Number = 27
-    Identifier = 28
-    Cos = 29
-    Sin = 30
-    Tan = 31
+    String = 22
+    Setq = 23
+    Error = 24
+    Number = 25
+    Identifier = 26
+    Cos = 27
+    Sin = 28
+    Tan = 29
+    LessThan = 30
+    GreaterThan = 31
 
 
 # class token to hold string and token type
@@ -91,39 +91,42 @@ Operators = {";": TokenType.Semicolon,
              "<=": TokenType.LessThanOrEqualOp,
              ">=": TokenType.GreaterThanOrEqualOp,
              "=": TokenType.EqualOp,
-             "<": TokenType.LessThanOp,
-             ">": TokenType.GreaterThanOp
+             "<>": TokenType.NotEqualOp,
+             "<": TokenType.LessThan,
+             ">": TokenType.GreaterThan
              }
 
 Tokens = []  # to add tokens to list
 
 keywords_tokenType = [TokenType.OpenParenthesis,
-            TokenType.CloseParenthesis,
-            TokenType.Dotimes,
-            TokenType.When,
-            TokenType.Read,
-            TokenType.Write,
-            TokenType.LogicalFalse,
-            TokenType.Setq,
-            TokenType.Cos,
-            TokenType.Tan,
-            TokenType.LogicalTrue,
-            TokenType.Sin]
+                      TokenType.CloseParenthesis,
+                      TokenType.Dotimes,
+                      TokenType.When,
+                      TokenType.Read,
+                      TokenType.Write,
+                      TokenType.LogicalTrue,
+                      TokenType.LogicalFalse,
+                      TokenType.Sin,
+                      TokenType.Cos,
+                      TokenType.Tan,
+                      TokenType.Setq
+                      ]
 
 operators_tokenType = [TokenType.Semicolon,
-             TokenType.PlusOp,
-             TokenType.MinusOp,
-             TokenType.MultiplyOp,
-             TokenType.DivideOp,
-             TokenType.ModOp,
-             TokenType.RemOp,
-             TokenType.IncrementOp,
-             TokenType.DecrementOp,
-             TokenType.LessThanOrEqualOp,
-             TokenType.GreaterThanOrEqualOp,
-             TokenType.EqualOp,
-             TokenType.LessThanOp,
-             TokenType.GreaterThanOp]
+                       TokenType.PlusOp,
+                       TokenType.MinusOp,
+                       TokenType.MultiplyOp,
+                       TokenType.DivideOp,
+                       TokenType.ModOp,
+                       TokenType.RemOp,
+                       TokenType.IncrementOp,
+                       TokenType.DecrementOp,
+                       TokenType.LessThanOrEqualOp,
+                       TokenType.GreaterThanOrEqualOp,
+                       TokenType.EqualOp,
+                       TokenType.NotEqualOp,
+                       TokenType.LessThan,
+                       TokenType.GreaterThan]
 
 input_chars = {
     'letter': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
@@ -188,7 +191,7 @@ keywords_transition = [
     {'from': 11, 'to': 12, 'chars': 'i', 'label': 'i'},
     {'from': 12, 'to': 13, 'chars': 't', 'label': 't'},
     {'from': 13, 'to': 7, 'chars': 'e', 'label': 'e'},
-    {'from': 0, 'to': 7, 'chars': ')(', 'label': ')('},
+    {'from': 0, 'to': 7, 'chars': ')(t', 'label': ')( t'},
     {'from': 0, 'to': 14, 'chars': 'r', 'label': 'r'},
     {'from': 14, 'to': 15, 'chars': 'e', 'label': 'e'},
     {'from': 15, 'to': 16, 'chars': 'a', 'label': 'a'},
@@ -200,63 +203,35 @@ keywords_transition = [
     {'from': 19, 'to': 20, 'chars': 'e', 'label': 'e'},
     {'from': 20, 'to': 21, 'chars': 't', 'label': 't'},
     {'from': 21, 'to': 7, 'chars': 'q', 'label': 'q'},
-
-    {'from': 19, 'to': 25, 'chars': 'i', 'label': 'i'},
-    {'from': 25, 'to': 7, 'chars': 'n', 'label': 'n'},
-    {'from': 0, 'to': 23, 'chars': 'c', 'label': 'c'},
-    {'from': 23, 'to': 24, 'chars': 'o', 'label': 'o'},
-    {'from': 24, 'to': 7, 'chars': 's', 'label': 's'},
-    {'from': 0, 'to': 26, 'chars': 't', 'label': 't'},
-    {'from': 26, 'to': 27, 'chars': 'a', 'label': 'a'},
-    {'from': 27, 'to': 7, 'chars': 'n', 'label': 'n'},
-
     {'from': 0, 'to': 22, 'chars': 'oimehalq', 'label': 'oimehalq'},
-    {'from': 1, 'to': 22, 'chars': 'cdtimeswhnralq)(', 'label': 'cdtimeswhnralq)('},
-    {'from': 2, 'to': 22, 'chars': 'cdoimeswhnralq)(', 'label': 'cdoimeswhnralq)('},
-    {'from': 3, 'to': 22, 'chars': 'cdotmeswhnralq)(', 'label': 'cdotmeswhnralq)('},
-    {'from': 4, 'to': 22, 'chars': 'cdotieswhnralq)(', 'label': 'cdotieswhnralq)('},
-    {'from': 5, 'to': 22, 'chars': 'cdotimswhnralq)(', 'label': 'cdotimswhnralq)('},
-    {'from': 6, 'to': 22, 'chars': 'cdotimewhnralq)(', 'label': 'cdotimewhnralq)('},
-    {'from': 8, 'to': 22, 'chars': 'cdotimeswnalq)(', 'label': 'cdotimeswnalq)('},
-    {'from': 9, 'to': 22, 'chars': 'cdotimswhnralq)(', 'label': 'cdotimswhnralq)('},
-    {'from': 10, 'to': 22, 'chars': 'cdotimeswhralq)(', 'label': 'cdotimeswhralq)('},
-    {'from': 11, 'to': 22, 'chars': 'cdotmeswhnralq)(', 'label': 'cdotmeswhnralq)('},
-    {'from': 12, 'to': 22, 'chars': 'cdoimeswhnralq)(', 'label': 'cdoimeswhnralq)('},
-    {'from': 13, 'to': 22, 'chars': 'cdotimswhnralq)(', 'label': 'cdotimswhnralq)('},
-    {'from': 14, 'to': 22, 'chars': 'cdotimswhnralq)(', 'label': 'cdotimswhnralq)('},
-    {'from': 15, 'to': 22, 'chars': 'cdotimeswhnrlq)(', 'label': 'cdotimeswhnrlq)('},
-    {'from': 16, 'to': 22, 'chars': 'cotimeswhnralq)(', 'label': 'cotimeswhnralq)('},
-    {'from': 17, 'to': 22, 'chars': 'cdotmeswhnralq)(', 'label': 'cdotmeswhnralq)('},
-    {'from': 18, 'to': 22, 'chars': 'cdotimeswhnraq)(', 'label': 'cdotimeswhnraq)('},
-    {'from': 19, 'to': 22, 'chars': 'cdotmswhnralq)(', 'label': 'cdotmswhnralq)('},
-    {'from': 20, 'to': 22, 'chars': 'cdoimeswhnralq)(', 'label': 'cdoimeswhnralq)('},
-    {'from': 21, 'to': 22, 'chars': 'cdotimeswhnral)(', 'label': 'cdotimeswhnral)('},
-
-    {'from': 25, 'to': 22, 'chars': 'cdotimeswhralq)(', 'label': 'cdotimeswhralq)('},
-    {'from': 23, 'to': 22, 'chars': 'cdtimeswhnralq)(', 'label': 'cdtimeswhnralq)('},
-    {'from': 24, 'to': 22, 'chars': 'cdotimewhnralq)(', 'label': 'cdotimewhnralq)('},
-    {'from': 27, 'to': 22, 'chars': 'cdotimeswhralq)(', 'label': 'cdotimeswhralq)('},
-
+    {'from': 1, 'to': 22, 'chars': 'dtimeswhnralq)(', 'label': 'dtimeswhnralq)('},
+    {'from': 2, 'to': 22, 'chars': 'doimeswhnralq)(', 'label': 'doimeswhnralq)('},
+    {'from': 3, 'to': 22, 'chars': 'dotmeswhnralq)(', 'label': 'dotmeswhnralq)('},
+    {'from': 4, 'to': 22, 'chars': 'dotieswhnralq)(', 'label': 'dotieswhnralq)('},
+    {'from': 5, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 6, 'to': 22, 'chars': 'dotimewhnralq)(', 'label': 'dotimewhnralq)('},
+    {'from': 8, 'to': 22, 'chars': 'dotimeswnalq)(', 'label': 'dotimeswnalq)('},
+    {'from': 9, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 10, 'to': 22, 'chars': 'dotimeswhralq)(', 'label': 'dotimeswhralq)('},
+    {'from': 11, 'to': 22, 'chars': 'dotmeswhnralq)(', 'label': 'dotmeswhnralq)('},
+    {'from': 12, 'to': 22, 'chars': 'doimeswhnralq)(', 'label': 'doimeswhnralq)('},
+    {'from': 13, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 14, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 15, 'to': 22, 'chars': 'dotimeswhnrlq)(', 'label': 'dotimeswhnrlq)('},
+    {'from': 16, 'to': 22, 'chars': 'otimeswhnralq)(', 'label': 'otimeswhnralq)('},
+    {'from': 17, 'to': 22, 'chars': 'dotmeswhnralq)(', 'label': 'dotmeswhnralq)('},
+    {'from': 18, 'to': 22, 'chars': 'dotimeswhnraq)(', 'label': 'dotimeswhnraq)('},
+    {'from': 19, 'to': 22, 'chars': 'dotimswhnralq)(', 'label': 'dotimswhnralq)('},
+    {'from': 20, 'to': 22, 'chars': 'doimeswhnralq)(', 'label': 'doimeswhnralq)('},
+    {'from': 21, 'to': 22, 'chars': 'dotimeswhnral)(', 'label': 'dotimeswhnral)('},
     {'from': 22, 'to': 22, 'chars': 'dotimeswhnralq)(', 'label': 'dotimeswhnralq)('},
-    {'from': 7, 'to': 7, 'chars': ')(', 'label': ')('},
+    {'from': 7, 'to': 7, 'chars': 't)(', 'label': 't)('},
     {'from': 7, 'to': 1, 'chars': 'd', 'label': 'd'},
     {'from': 7, 'to': 8, 'chars': 'w', 'label': 'w'},
     {'from': 7, 'to': 14, 'chars': 'r', 'label': 'r'},
     {'from': 7, 'to': 17, 'chars': 'n', 'label': 'n'},
     {'from': 7, 'to': 19, 'chars': 's', 'label': 's'},
-    {'from': 7, 'to': 23, 'chars': 'c', 'label': 'c'},
-    {'from': 7, 'to': 26, 'chars': 't', 'label': 't'},
     {'from': 7, 'to': 22, 'chars': 'oimehalq', 'label': 'oimehalq'},
-
-    {'from': 26, 'to': 7, 'chars': ')(', 'label': ')('},
-    {'from': 26, 'to': 1, 'chars': 'd', 'label': 'd'},
-    {'from': 26, 'to': 8, 'chars': 'w', 'label': 'w'},
-    {'from': 26, 'to': 14, 'chars': 'r', 'label': 'r'},
-    {'from': 26, 'to': 17, 'chars': 'n', 'label': 'n'},
-    {'from': 26, 'to': 19, 'chars': 's', 'label': 's'},
-    {'from': 26, 'to': 23, 'chars': 'c', 'label': 'c'},
-    {'from': 26, 'to': 26, 'chars': 't', 'label': 't'},
-    {'from': 26, 'to': 22, 'chars': 'oimehalq', 'label': 'oimehalq'},
 ]
 
 operators_transitions = [
@@ -300,7 +275,7 @@ string_dfa = graphviz.Digraph('s', filename='string')
 keywords_dfa = graphviz.Digraph('k', filename='keyword')
 operators_dfa = graphviz.Digraph('o', filename='operator')
 
-keywords_dfa.attr(size='12,9.5', rankdir='LR', ranksep='0.05', nodesep='0.2')
+keywords_dfa.attr(size='13,9.5', rankdir='LR', ranksep='0.05', nodesep='0.2')
 operators_dfa.attr(size='13,9.5', rankdir='LR', ranksep='0.05', nodesep='0.2')
 
 #  constant dfa
@@ -316,7 +291,7 @@ str_accpet_states = [2]
 str_reject_states = [3]
 
 # keywords dfa
-key_accpet_states = [7, 26]
+key_accpet_states = [7]
 key_reject_states = [22]
 
 # operator dfa
@@ -399,9 +374,9 @@ def tokenize(text):
             continue
 
         # invalid token
-        jump = -1  # mafrod akamel l7ad awl space wla law la2eet ")" awa2f???
+        jump = -1
         for i, char in enumerate(text):
-            if char == ' ' or char == ')' or char == '(':
+            if char == ' ' or char == ')' or char == '(' or char == '\n':
                 jump = i
                 break
 
@@ -467,10 +442,9 @@ def get_dfa(t_type):
         node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'white', '5': 'white',
                        '6': 'white', '7': 'white', '8': 'white', '9': 'white', '10': 'white', '11': 'white',
                        '12': 'white', '13': 'white', '14': 'white', '15': 'white', '16': 'white', '17': 'white',
-                       '18': 'white', '19': 'white', '20': 'white', '21': 'white', '22': 'red', '23': 'white',
-                       '24': 'white', '25': 'white', '26': 'white', '27': 'white'}
+                       '18': 'white', '19': 'white', '20': 'white', '21': 'white', '22': 'red'}
         Transisions = keywords_transition
-        label_node = '28'
+        label_node = '23'
     elif t_type in operators_tokenType:
         DFA = operators_dfa
         node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'white', '5': 'white',
@@ -525,13 +499,12 @@ def update(frame):
 
 
 root = tk.Tk()
-root.configure(bg='white')
 root.title("Tokenize Input")
 
-input_label = tk.Label(root, text="Enter Input:", bg = 'white')
+input_label = tk.Label(root, text="Enter Input:")
 input_label.pack()
 
-input_box = tk.Text(root, height=8, width=50, bg = 'lightgray')
+input_box = tk.Text(root, height=8, width=50)
 input_box.pack()
 
 animation_label = None
@@ -596,13 +569,13 @@ def display_animation():
     already_pressed = True
 
 
-tokenize_button = tk.Button(root, text="Tokenize Input", command=scan, bg = 'lightblue')
+tokenize_button = tk.Button(root, text="Tokenize Input", command=scan)
 tokenize_button.pack()
 
 create_dfa(constant_dfa, Constant_transitions, const_accept_states, const_reject_states, '5')
 create_dfa(identifier_dfa, identifiers_transitions, iden_accept_states, iden_reject_states, '3')
 create_dfa(string_dfa, string_transitions, str_accpet_states, str_reject_states, '4')
-create_dfa(keywords_dfa, keywords_transition, key_accpet_states, key_reject_states, '28')
+create_dfa(keywords_dfa, keywords_transition, key_accpet_states, key_reject_states, '23')
 create_dfa(operators_dfa, operators_transitions, op_accpet_states, op_reject_states, '12')
 
 
@@ -611,6 +584,7 @@ create_dfa(operators_dfa, operators_transitions, op_accpet_states, op_reject_sta
 
 def main():
     root.mainloop()
+
 
 
 if __name__ == "__main__":
