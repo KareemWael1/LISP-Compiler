@@ -405,7 +405,7 @@ def rule(productions, index, func_name):
     :param productions: list of productions to be matched
     :param index: index of the current token being parsed
     :param func_name: name of the function that called rule()
-    :return:
+    :return: out{} with keys mode, node, and index
     """
     arr = []
     out = {}
