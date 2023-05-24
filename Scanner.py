@@ -147,12 +147,12 @@ Constant_transitions = [
 ]
 
 identifiers_transitions = [
-    {'from': 0, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'],
-     'label': 'letter +-*/<=>&_'},
-    {'from': 0, 'to': 2, 'chars': input_chars['digit'] + input_chars['special_char'],
-     'label': 'digit special_character'},
+    {'from': 0, 'to': 1, 'chars': input_chars['letter'],
+     'label': 'letter'},
+    {'from': 0, 'to': 2, 'chars': input_chars['digit'] + input_chars['special_char'] + input_chars['identifier_operator'],
+     'label': 'digit special_character +-*/<=>&_'},
     {'from': 1, 'to': 1, 'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'],
-     'label': 'letter +-*/<=>&_'},
+     'label': 'letter +-*/<=>&_ digit'},
     {'from': 1, 'to': 2, 'chars': input_chars['special_char'], 'label': 'special_character'},
     {'from': 2, 'to': 2,
      'chars': input_chars['letter'] + input_chars['identifier_operator'] + input_chars['digit'] + input_chars[
@@ -475,13 +475,11 @@ def get_dfa(t_type):
         Transisions = operators_transitions
         label_node = '12'
     else:
-        DFA = operators_dfa
-        node_colors = {'0': 'white', '1': 'white', '2': 'white', '3': 'white', '4': 'white', '5': 'white',
-                       '6': 'white', '7': 'white', '8': 'white', '9': 'white', '10': 'white', '11': 'red'}
-        Transisions = operators_transitions
-        label_node = '12'
+        DFA = None
+        node_colors = None
+        Transisions = None
+        label_node = None
     return DFA, node_colors, Transisions, label_node
-
 
 frames = []
 
@@ -490,6 +488,8 @@ def update(frame):
     frames.clear()
     for token in Tokens:
         DFA, node_colors, Transisions, label_node = get_dfa(token.token_type)
+        if DFA == None:
+            break
         start_state = 0
         current_state = start_state
         for state, color in node_colors.items():
@@ -528,7 +528,7 @@ root.title("Tokenize Input")
 input_label = tk.Label(root, text="Enter Input:", bg='white')
 input_label.pack()
 
-input_box = tk.Text(root, height=8, width=50, bg='lightgray')
+input_box = tk.Text(root, height=6, width=50, bg = 'lightgray')
 input_box.pack()
 
 animation_label = None
@@ -557,7 +557,6 @@ def scan():
 
     combined_frames = combined_frames[..., :3]
     imageio.mimsave('new.gif', combined_frames, format='GIF', duration=1000)
-    time.sleep(0.5)
     Tokens.clear()
     display_animation()
 
