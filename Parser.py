@@ -469,5 +469,6 @@ def parse():
     d_t_da_pt2.show()
 
     Scanner.Tokens.clear()
+    errors.clear()
     node.draw()
 
