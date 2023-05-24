@@ -524,7 +524,7 @@ def update(frame):
 
 root = tk.Tk()
 root.configure(bg='white')
-root.title("Tokenize Input")
+root.title("Lisp Compiler")
 
 input_label = tk.Label(root, text="Enter Input:", bg='white')
 input_label.pack()
