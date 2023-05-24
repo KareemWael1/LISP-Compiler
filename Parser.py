@@ -392,7 +392,7 @@ def lookahead(arr, index):
     """
     :param arr: list of productions
     :param index: index of the current token being parsed
-    :return:
+    :return: boolean
     """
     for i in arr:
         if match_token(i, index, False)["node"] != ["error"]:
