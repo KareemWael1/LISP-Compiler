@@ -121,7 +121,8 @@ operators_tokenType = [TokenType.PlusOp,
                        TokenType.GreaterThanOrEqualOp,
                        TokenType.EqualOp,
                        TokenType.LessThanOp,
-                       TokenType.GreaterThanOp]
+                       TokenType.GreaterThanOp,
+                       TokenType.NotEqualOp]
 
 input_chars = {
     'letter': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
