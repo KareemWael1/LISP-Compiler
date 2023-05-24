@@ -30,32 +30,8 @@ def Lists_dash(ind):
 
 
 def List(ind):
-    productions = [Scanner.TokenType.OpenParenthesis, Contents, Scanner.TokenType.CloseParenthesis]
+    productions = [Scanner.TokenType.OpenParenthesis, Content, Scanner.TokenType.CloseParenthesis]
     return rule(productions, ind, "List")
-
-
-def Contents(ind):
-    productions = [Content, Contents_dash]
-    return rule(productions, ind, "Contents")
-
-
-def Contents_dash(ind):
-    out = {}
-    if lookahead([Scanner.TokenType.OpenParenthesis, Scanner.TokenType.Dotimes, Scanner.TokenType.When,
-                  Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp, Scanner.TokenType.Write,
-                  Scanner.TokenType.Sin, Scanner.TokenType.Cos, Scanner.TokenType.Tan,
-                  Scanner.TokenType.Setq, Scanner.TokenType.PlusOp, Scanner.TokenType.MinusOp,
-                  Scanner.TokenType.MultiplyOp, Scanner.TokenType.DivideOp, Scanner.TokenType.ModOp,
-                  Scanner.TokenType.RemOp, Scanner.TokenType.GreaterThanOrEqualOp, Scanner.TokenType.LessThanOrEqualOp,
-                  Scanner.TokenType.GreaterThanOp, Scanner.TokenType.LessThanOp, Scanner.TokenType.EqualOp,
-                  Scanner.TokenType.NotEqualOp, Scanner.TokenType.Identifier, Scanner.TokenType.Read,
-                  Scanner.TokenType.LogicalTrue, Scanner.TokenType.LogicalFalse], ind):
-        productions = [Content, Contents_dash]
-        return rule(productions, ind, "Contents`")
-    else:
-        out["node"] = Tree("Contents`", ["ε"])
-        out["index"] = ind
-        return out
 
 
 def Content(ind):
@@ -144,7 +120,7 @@ def Function(ind):
         productions = [OtherFunction]
         return rule(productions, ind, "Function")
     elif Match(Scanner.TokenType.Read, ind, False)["node"] != ["error"]:
-        productions = [Scanner.TokenType.Read]
+        productions = [ReadFunction]
         return rule(productions, ind, "Function")
     elif lookahead([Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp], ind):
         productions = [UnaryBinaryFunction]
@@ -159,6 +135,11 @@ def Function(ind):
         out["node"] = ["error"]
         out["index"] = ind
         return out
+
+
+def ReadFunction(ind):
+    productions = [Scanner.TokenType.Read, ExtraValue]
+    return rule(productions, ind, "ReadFunction")
 
 
 def UnaryFunction(ind):
@@ -504,7 +485,6 @@ def parse():
     d_t_da_pt2 = pt.Table(d_t_da2, dataframe=df1, showtoolbar=True, showstatusbar=True)
     d_t_da_pt2.show()
 
-    node.draw()
     Scanner.Tokens.clear()
     errors.clear()
-
+    node.draw()
