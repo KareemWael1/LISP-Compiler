@@ -468,5 +468,6 @@ def parse():
     d_t_da_pt2 = pt.Table(d_t_da2, dataframe=df1, showtoolbar=True, showstatusbar=True)
     d_t_da_pt2.show()
 
+    Scanner.Tokens.clear()
     node.draw()
 
