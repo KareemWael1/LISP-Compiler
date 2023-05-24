@@ -20,7 +20,7 @@ def Lists(index):
 
 def Lists_dash(index):
     out = {}
-    if Match(Scanner.TokenType.OpenParenthesis, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.OpenParenthesis, index, False)["node"] != ["error"]:
         productions = [List, Lists_dash]
         return rule(productions, index, "Lists`")
     else:
@@ -36,7 +36,7 @@ def List(index):
 
 def Content(index):
     out = {}
-    if Match(Scanner.TokenType.OpenParenthesis, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.OpenParenthesis, index, False)["node"] != ["error"]:
         productions = [List]
         return rule(productions, index, "Content")
     elif lookahead([Scanner.TokenType.Dotimes, Scanner.TokenType.When], index):
@@ -63,11 +63,11 @@ def Content(index):
 
 def Block(index):
     out = {}
-    if Match(Scanner.TokenType.Dotimes, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.Dotimes, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Dotimes, Scanner.TokenType.OpenParenthesis, Scanner.TokenType.Identifier,
                        Value, Scanner.TokenType.CloseParenthesis, Lists]
         return rule(productions, index, "Block")
-    elif Match(Scanner.TokenType.When, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.When, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.When, Scanner.TokenType.OpenParenthesis, Expression,
                        Scanner.TokenType.CloseParenthesis, Lists]
         return rule(productions, index, "Block")
@@ -91,10 +91,10 @@ def Expression(index):
                   Scanner.TokenType.NotEqualOp, Scanner.TokenType.Identifier, Scanner.TokenType.Read], index):
         productions = [Function]
         return rule(productions, index, "Expression")
-    elif Match(Scanner.TokenType.LogicalTrue, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.LogicalTrue, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.LogicalTrue]
         return rule(productions, index, "Expression")
-    elif Match(Scanner.TokenType.LogicalFalse, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.LogicalFalse, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.LogicalFalse]
         return rule(productions, index, "Expression")
     else:
@@ -116,10 +116,10 @@ def Function(index):
              Scanner.TokenType.NotEqualOp], index):
         productions = [BinaryFunction]
         return rule(productions, index, "Function")
-    elif Match(Scanner.TokenType.Identifier, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.Identifier, index, False)["node"] != ["error"]:
         productions = [OtherFunction]
         return rule(productions, index, "Function")
-    elif Match(Scanner.TokenType.Read, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.Read, index, False)["node"] != ["error"]:
         productions = [ReadFunction]
         return rule(productions, index, "Function")
     elif lookahead([Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp], index):
@@ -166,16 +166,16 @@ def ExtraValue(index):
 
 def UnaryFunctionName(index):
     out = {}
-    if Match(Scanner.TokenType.Write, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.Write, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Write]
         return rule(productions, index, "UnaryFunctionName")
-    elif Match(Scanner.TokenType.Sin, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.Sin, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Sin]
         return rule(productions, index, "UnaryFunctionName")
-    elif Match(Scanner.TokenType.Cos, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.Cos, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Cos]
         return rule(productions, index, "UnaryFunctionName")
-    elif Match(Scanner.TokenType.Tan, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.Tan, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Tan]
         return rule(productions, index, "UnaryFunctionName")
     else:
@@ -187,7 +187,7 @@ def UnaryFunctionName(index):
 
 def BinaryFunction(index):
     out = {}
-    if Match(Scanner.TokenType.Setq, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.Setq, index, False)["node"] != ["error"]:
         productions = [SetqFunction]
         return rule(productions, index, "BinaryFunction")
     elif lookahead([Scanner.TokenType.PlusOp, Scanner.TokenType.MinusOp, Scanner.TokenType.MultiplyOp,
@@ -222,10 +222,10 @@ def OtherFunction(index):
 
 def UnaryBinaryOperator(index):
     out = {}
-    if Match(Scanner.TokenType.IncrementOp, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.IncrementOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.IncrementOp]
         return rule(productions, index, "UnaryOperator")
-    elif Match(Scanner.TokenType.DecrementOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.DecrementOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.DecrementOp]
         return rule(productions, index, "UnaryOperator")
     else:
@@ -242,16 +242,16 @@ def BinaryMoreFunction(index):
 
 def BinaryMoreOperator(index):
     out = {}
-    if Match(Scanner.TokenType.PlusOp, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.PlusOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.PlusOp]
         return rule(productions, index, "BinaryMoreOperator")
-    elif Match(Scanner.TokenType.MinusOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.MinusOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.MinusOp]
         return rule(productions, index, "BinaryMoreOperator")
-    elif Match(Scanner.TokenType.MultiplyOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.MultiplyOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.MultiplyOp]
         return rule(productions, index, "BinaryMoreOperator")
-    elif Match(Scanner.TokenType.DivideOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.DivideOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.DivideOp]
         return rule(productions, index, "BinaryMoreOperator")
     else:
@@ -263,28 +263,28 @@ def BinaryMoreOperator(index):
 
 def BinaryOperator(index):
     out = {}
-    if Match(Scanner.TokenType.ModOp, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.ModOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.ModOp]
         return rule(productions, index, "BinaryOperator")
-    elif Match(Scanner.TokenType.RemOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.RemOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.RemOp]
         return rule(productions, index, "BinaryOperator")
-    elif Match(Scanner.TokenType.GreaterThanOrEqualOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.GreaterThanOrEqualOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.GreaterThanOrEqualOp]
         return rule(productions, index, "BinaryOperator")
-    elif Match(Scanner.TokenType.LessThanOrEqualOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.LessThanOrEqualOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.LessThanOrEqualOp]
         return rule(productions, index, "BinaryOperator")
-    elif Match(Scanner.TokenType.GreaterThanOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.GreaterThanOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.GreaterThanOp]
         return rule(productions, index, "BinaryOperator")
-    elif Match(Scanner.TokenType.LessThanOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.LessThanOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.LessThanOp]
         return rule(productions, index, "BinaryOperator")
-    elif Match(Scanner.TokenType.EqualOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.EqualOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.EqualOp]
         return rule(productions, index, "BinaryOperator")
-    elif Match(Scanner.TokenType.NotEqualOp, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.NotEqualOp, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.NotEqualOp]
         return rule(productions, index, "BinaryOperator")
     else:
@@ -326,13 +326,13 @@ def Value(index):
     elif lookahead([Scanner.TokenType.OpenParenthesis], index):
         productions = [Scanner.TokenType.OpenParenthesis, Function, Scanner.TokenType.CloseParenthesis]
         return rule(productions, index, "Value")
-    elif Match(Scanner.TokenType.LogicalTrue, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.LogicalTrue, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.LogicalTrue]
         return rule(productions, index, "Value")
-    elif Match(Scanner.TokenType.LogicalFalse, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.LogicalFalse, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.LogicalFalse]
         return rule(productions, index, "Value")
-    elif Match(Scanner.TokenType.String, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.String, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.String]
         return rule(productions, index, "Value")
     else:
@@ -345,10 +345,10 @@ def Value(index):
 
 def Atom(index):
     out = {}
-    if Match(Scanner.TokenType.Identifier, index, False)["node"] != ["error"]:
+    if match_token(Scanner.TokenType.Identifier, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Identifier]
         return rule(productions, index, "Atom")
-    elif Match(Scanner.TokenType.Number, index, False)["node"] != ["error"]:
+    elif match_token(Scanner.TokenType.Number, index, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Number]
         return rule(productions, index, "Atom")
     else:
@@ -359,10 +359,22 @@ def Atom(index):
 
 
 def is_error(arr):
+    """
+    Check if the last element of a list is an error token or production.
+    :param arr: A list of parsed tokens and productions.
+    :return: True if the last element of `arr` is an error token or production, False otherwise.
+    """
     return 'mode' in arr[-1].keys() and arr[-1]['mode'] == ['error']
 
 
 def match_production(arr, match, position, j):
+    """
+    :param arr: list that holds the parsed tokens and productions
+    :param match: function or token that is being matched
+    :param position: integer that indicates the index argument passed to match()
+    :param j: index of the token being parsed
+    :return: array of parsed tokens and productions
+    """
     if callable(match):
         if position == 0:
             arr.append(match(j))
@@ -370,20 +382,31 @@ def match_production(arr, match, position, j):
             arr.append(match(arr[-1]['index']))
     else:
         if position == 0:
-            arr.append(Match(match, j))
+            arr.append(match_token(match, j))
         else:
-            arr.append(Match(match, arr[-1]['index']))
+            arr.append(match_token(match, arr[-1]['index']))
     return arr
 
 
-def lookahead(Arr, index):
-    for i in Arr:
-        if Match(i, index, False)["node"] != ["error"]:
+def lookahead(arr, index):
+    """
+    :param arr: list of productions
+    :param index: index of the current token being parsed
+    :return:
+    """
+    for i in arr:
+        if match_token(i, index, False)["node"] != ["error"]:
             return True
     return False
 
 
 def rule(productions, index, func_name):
+    """
+    :param productions: list of productions to be matched
+    :param index: index of the current token being parsed
+    :param func_name: name of the function that called rule()
+    :return:
+    """
     arr = []
     out = {}
     children = []
@@ -412,7 +435,13 @@ def rule(productions, index, func_name):
     return out
 
 
-def Match(a, j, report=True):
+def match_token(a, j, report=True):
+    """
+    :param a: expected token type
+    :param j: index of token in Scanner.Tokens[]
+    :param report: boolean argument for either checking errors or not
+    :return: output{} with keys mode, node, and index
+    """
     output = dict()
     if j < len(Scanner.Tokens):
         temp = Scanner.Tokens[j].to_dict()
