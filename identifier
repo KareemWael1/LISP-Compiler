@@ -1,11 +1,13 @@
 digraph g {
 	3 [label=token labeljust=center labelloc=top shape=rectangle]
+	4 -> 0
+	4 [height=0 style=invisible width=0]
 	0 [fillcolor="" shape=circle style=""]
 	1 [fillcolor="" shape=doublecircle style=""]
 	2 [fillcolor=red shape=circle style=filled]
-	0 -> 1 [label="[letter +-*/<=>&_]"]
-	0 -> 2 [label="[digit special_character]"]
-	1 -> 1 [label="[letter +-*/<=>&_]"]
+	0 -> 1 [label="[letter]"]
+	0 -> 2 [label="[digit special_character +-*/<=>&_]"]
+	1 -> 1 [label="[letter +-*/<=>&_ digit]"]
 	1 -> 2 [label="[special_character]"]
 	2 -> 2 [label="[any]"]
 	0 [fillcolor=white style=filled]

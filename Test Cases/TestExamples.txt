@@ -1,6 +1,6 @@
 (+ x y)(setq z 5)(- u (* 3 (incf x)))
 
-(dotimes (n 11)(write n) (write (* n n))
+(dotimes (n 11)(write n) (write (* n n)))
 
 (< x 6) (> x 6) (mod x 6)
 
@@ -9,3 +9,7 @@
 (setq x 5
 
 (+ x y)(setq 8 5)(- u v)
+
+( + 2 )
+
+(<> x y

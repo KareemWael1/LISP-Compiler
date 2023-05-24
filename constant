@@ -1,5 +1,8 @@
 digraph G {
+	size=6
 	5 [label=token labeljust=center labelloc=top shape=rectangle]
+	6 -> 0
+	6 [height=0 style=invisible width=0]
 	0 [fillcolor="" shape=circle style=""]
 	1 [fillcolor="" shape=doublecircle style=""]
 	2 [fillcolor="" shape=circle style=""]

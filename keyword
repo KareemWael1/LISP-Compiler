@@ -1,6 +1,8 @@
 digraph k {
 	nodesep=0.2 rankdir=LR ranksep=0.05 size="12,9.5"
 	28 [label=token labeljust=center labelloc=top shape=rectangle]
+	29 -> 0
+	29 [height=0 style=invisible width=0]
 	0 [fillcolor="" shape=circle style=""]
 	1 [fillcolor="" shape=circle style=""]
 	2 [fillcolor="" shape=circle style=""]

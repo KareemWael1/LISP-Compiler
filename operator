@@ -1,6 +1,8 @@
 digraph o {
 	nodesep=0.2 rankdir=LR ranksep=0.05 size="13,9.5"
 	12 [label=token labeljust=center labelloc=top shape=rectangle]
+	13 -> 0
+	13 [height=0 style=invisible width=0]
 	0 [fillcolor="" shape=circle style=""]
 	1 [fillcolor="" shape=circle style=""]
 	2 [fillcolor="" shape=circle style=""]

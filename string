@@ -1,5 +1,7 @@
 digraph s {
 	4 [label=token labeljust=center labelloc=top shape=rectangle]
+	5 -> 0
+	5 [height=0 style=invisible width=0]
 	0 [fillcolor="" shape=circle style=""]
 	1 [fillcolor="" shape=circle style=""]
 	2 [fillcolor="" shape=doublecircle style=""]
