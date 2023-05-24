@@ -49,6 +49,7 @@ class TokenType(Enum):  # listing all tokens type
     Identifier = 29
     Error = 30
 
+
 # class token to hold string and token type
 class Token:
     def __init__(self, lex, token_type):
@@ -95,31 +96,31 @@ Operators = {"+": TokenType.PlusOp,
 Tokens = []  # to add tokens to list
 
 keywords_tokenType = [TokenType.OpenParenthesis,
-            TokenType.CloseParenthesis,
-            TokenType.Dotimes,
-            TokenType.When,
-            TokenType.Read,
-            TokenType.Write,
-            TokenType.LogicalFalse,
-            TokenType.Setq,
-            TokenType.Cos,
-            TokenType.Tan,
-            TokenType.LogicalTrue,
-            TokenType.Sin]
+                      TokenType.CloseParenthesis,
+                      TokenType.Dotimes,
+                      TokenType.When,
+                      TokenType.Read,
+                      TokenType.Write,
+                      TokenType.LogicalFalse,
+                      TokenType.Setq,
+                      TokenType.Cos,
+                      TokenType.Tan,
+                      TokenType.LogicalTrue,
+                      TokenType.Sin]
 
 operators_tokenType = [TokenType.PlusOp,
-             TokenType.MinusOp,
-             TokenType.MultiplyOp,
-             TokenType.DivideOp,
-             TokenType.ModOp,
-             TokenType.RemOp,
-             TokenType.IncrementOp,
-             TokenType.DecrementOp,
-             TokenType.LessThanOrEqualOp,
-             TokenType.GreaterThanOrEqualOp,
-             TokenType.EqualOp,
-             TokenType.LessThanOp,
-             TokenType.GreaterThanOp]
+                       TokenType.MinusOp,
+                       TokenType.MultiplyOp,
+                       TokenType.DivideOp,
+                       TokenType.ModOp,
+                       TokenType.RemOp,
+                       TokenType.IncrementOp,
+                       TokenType.DecrementOp,
+                       TokenType.LessThanOrEqualOp,
+                       TokenType.GreaterThanOrEqualOp,
+                       TokenType.EqualOp,
+                       TokenType.LessThanOp,
+                       TokenType.GreaterThanOp]
 
 input_chars = {
     'letter': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
@@ -524,7 +525,7 @@ root = tk.Tk()
 root.configure(bg='white')
 root.title("Tokenize Input")
 
-input_label = tk.Label(root, text="Enter Input:", bg = 'white')
+input_label = tk.Label(root, text="Enter Input:", bg='white')
 input_label.pack()
 
 input_box = tk.Text(root, height=6, width=50, bg = 'lightgray')
@@ -591,7 +592,7 @@ def display_animation():
     already_pressed = True
 
 
-tokenize_button = tk.Button(root, text="Tokenize Input", command=scan, bg = 'lightblue', width=12)
+tokenize_button = tk.Button(root, text="Tokenize Input", command=scan, bg='lightblue', width=12)
 tokenize_button.pack()
 
 create_dfa(constant_dfa, Constant_transitions, const_accept_states, const_reject_states, '5')

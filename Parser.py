@@ -30,32 +30,8 @@ def Lists_dash(ind):
 
 
 def List(ind):
-    productions = [Scanner.TokenType.OpenParenthesis, Contents, Scanner.TokenType.CloseParenthesis]
+    productions = [Scanner.TokenType.OpenParenthesis, Content, Scanner.TokenType.CloseParenthesis]
     return rule(productions, ind, "List")
-
-
-def Contents(ind):
-    productions = [Content, Contents_dash]
-    return rule(productions, ind, "Contents")
-
-
-def Contents_dash(ind):
-    out = {}
-    if lookahead([Scanner.TokenType.OpenParenthesis, Scanner.TokenType.Dotimes, Scanner.TokenType.When,
-                  Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp, Scanner.TokenType.Write,
-                  Scanner.TokenType.Sin, Scanner.TokenType.Cos, Scanner.TokenType.Tan,
-                  Scanner.TokenType.Setq, Scanner.TokenType.PlusOp, Scanner.TokenType.MinusOp,
-                  Scanner.TokenType.MultiplyOp, Scanner.TokenType.DivideOp, Scanner.TokenType.ModOp,
-                  Scanner.TokenType.RemOp, Scanner.TokenType.GreaterThanOrEqualOp, Scanner.TokenType.LessThanOrEqualOp,
-                  Scanner.TokenType.GreaterThanOp, Scanner.TokenType.LessThanOp, Scanner.TokenType.EqualOp,
-                  Scanner.TokenType.NotEqualOp, Scanner.TokenType.Identifier, Scanner.TokenType.Read,
-                  Scanner.TokenType.LogicalTrue, Scanner.TokenType.LogicalFalse], ind):
-        productions = [Content, Contents_dash]
-        return rule(productions, ind, "Contents`")
-    else:
-        out["node"] = Tree("Contents`", ["ε"])
-        out["index"] = ind
-        return out
 
 
 def Content(ind):
@@ -89,7 +65,7 @@ def Block(ind):
     out = {}
     if Match(Scanner.TokenType.Dotimes, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.Dotimes, Scanner.TokenType.OpenParenthesis, Scanner.TokenType.Identifier,
-                       Scanner.TokenType.Number, Scanner.TokenType.CloseParenthesis, Lists]
+                       Value, Scanner.TokenType.CloseParenthesis, Lists]
         return rule(productions, ind, "Block")
     elif Match(Scanner.TokenType.When, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.When, Scanner.TokenType.OpenParenthesis, Expression,
@@ -130,16 +106,12 @@ def Expression(ind):
 
 def Function(ind):
     out = {}
-    if lookahead([Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp, Scanner.TokenType.Write,
-                  Scanner.TokenType.Sin, Scanner.TokenType.Cos,
-                  Scanner.TokenType.Tan], ind):
+    if lookahead([Scanner.TokenType.Write, Scanner.TokenType.Sin, Scanner.TokenType.Cos, Scanner.TokenType.Tan], ind):
         productions = [UnaryFunction]
         return rule(productions, ind, "Function")
     elif lookahead(
-            [Scanner.TokenType.Setq, Scanner.TokenType.PlusOp, Scanner.TokenType.MinusOp, Scanner.TokenType.MultiplyOp,
-             Scanner.TokenType.DivideOp,
-             Scanner.TokenType.ModOp, Scanner.TokenType.RemOp, Scanner.TokenType.GreaterThanOrEqualOp,
-             Scanner.TokenType.LessThanOrEqualOp,
+            [Scanner.TokenType.Setq, Scanner.TokenType.ModOp, Scanner.TokenType.RemOp,
+             Scanner.TokenType.GreaterThanOrEqualOp, Scanner.TokenType.LessThanOrEqualOp,
              Scanner.TokenType.GreaterThanOp, Scanner.TokenType.LessThanOp, Scanner.TokenType.EqualOp,
              Scanner.TokenType.NotEqualOp], ind):
         productions = [BinaryFunction]
@@ -148,7 +120,15 @@ def Function(ind):
         productions = [OtherFunction]
         return rule(productions, ind, "Function")
     elif Match(Scanner.TokenType.Read, ind, False)["node"] != ["error"]:
-        productions = [Scanner.TokenType.Read]
+        productions = [ReadFunction]
+        return rule(productions, ind, "Function")
+    elif lookahead([Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp], ind):
+        productions = [UnaryBinaryFunction]
+        return rule(productions, ind, "Function")
+    elif lookahead(
+            [Scanner.TokenType.PlusOp, Scanner.TokenType.MinusOp, Scanner.TokenType.MultiplyOp,
+             Scanner.TokenType.DivideOp], ind):
+        productions = [BinaryMoreFunction]
         return rule(productions, ind, "Function")
     else:
         out["mode"] = ["error"]
@@ -157,17 +137,38 @@ def Function(ind):
         return out
 
 
+def ReadFunction(ind):
+    productions = [Scanner.TokenType.Read, ExtraValue]
+    return rule(productions, ind, "ReadFunction")
+
+
 def UnaryFunction(ind):
+    productions = [UnaryFunctionName, Value]
+    return rule(productions, ind, "UnaryFunction")
+
+
+def UnaryBinaryFunction(ind):
+    productions = [UnaryBinaryOperator, Scanner.TokenType.Identifier, ExtraValue]
+    return rule(productions, ind, "UnaryBinaryFunction")
+
+
+def ExtraValue(ind):
     out = {}
-    if lookahead([Scanner.TokenType.Write, Scanner.TokenType.Sin, Scanner.TokenType.Cos, Scanner.TokenType.Tan], ind):
-        productions = [UnaryFunctionName, Value]
-        return rule(productions, ind, "UnaryFunction")
-    elif lookahead([Scanner.TokenType.IncrementOp, Scanner.TokenType.DecrementOp], ind):
-        productions = [UnaryOperator, Scanner.TokenType.Identifier]
-        return rule(productions, ind, "UnaryFunction")
+    if lookahead([Scanner.TokenType.Identifier, Scanner.TokenType.Number, Scanner.TokenType.IncrementOp,
+                  Scanner.TokenType.DecrementOp, Scanner.TokenType.Write,
+                  Scanner.TokenType.Sin, Scanner.TokenType.Cos, Scanner.TokenType.Tan, Scanner.TokenType.Setq,
+                  Scanner.TokenType.PlusOp, Scanner.TokenType.MinusOp,
+                  Scanner.TokenType.MultiplyOp, Scanner.TokenType.DivideOp, Scanner.TokenType.ModOp,
+                  Scanner.TokenType.RemOp,
+                  Scanner.TokenType.GreaterThanOrEqualOp, Scanner.TokenType.LessThanOrEqualOp,
+                  Scanner.TokenType.GreaterThanOp,
+                  Scanner.TokenType.LessThanOp, Scanner.TokenType.EqualOp, Scanner.TokenType.NotEqualOp,
+                  Scanner.TokenType.Identifier, Scanner.TokenType.Read,
+                  Scanner.TokenType.LogicalTrue, Scanner.TokenType.LogicalFalse, Scanner.TokenType.String], ind):
+        productions = [Value]
+        return rule(productions, ind, "ExtraValue")
     else:
-        out["mode"] = ["error"]
-        out["node"] = ["error"]
+        out["node"] = Tree("ExtraValue", ["ε"])
         out["index"] = ind
         return out
 
@@ -228,7 +229,7 @@ def OtherFunction(ind):
     return rule(productions, ind, "OtherFunction")
 
 
-def UnaryOperator(ind):
+def UnaryBinaryOperator(ind):
     out = {}
     if Match(Scanner.TokenType.IncrementOp, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.IncrementOp]
@@ -243,21 +244,35 @@ def UnaryOperator(ind):
         return out
 
 
-def BinaryOperator(ind):
+def BinaryMoreFunction(ind):
+    productions = [BinaryMoreOperator, Value, Value, Parameters]
+    return rule(productions, ind, "BinaryMoreFunction")
+
+
+def BinaryMoreOperator(ind):
     out = {}
     if Match(Scanner.TokenType.PlusOp, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.PlusOp]
-        return rule(productions, ind, "BinaryOperator")
+        return rule(productions, ind, "BinaryMoreOperator")
     elif Match(Scanner.TokenType.MinusOp, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.MinusOp]
-        return rule(productions, ind, "BinaryOperator")
+        return rule(productions, ind, "BinaryMoreOperator")
     elif Match(Scanner.TokenType.MultiplyOp, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.MultiplyOp]
-        return rule(productions, ind, "BinaryOperator")
+        return rule(productions, ind, "BinaryMoreOperator")
     elif Match(Scanner.TokenType.DivideOp, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.DivideOp]
-        return rule(productions, ind, "BinaryOperator")
-    elif Match(Scanner.TokenType.ModOp, ind, False)["node"] != ["error"]:
+        return rule(productions, ind, "BinaryMoreOperator")
+    else:
+        out["mode"] = ["error"]
+        out["node"] = ["error"]
+        out["index"] = ind
+        return out
+
+
+def BinaryOperator(ind):
+    out = {}
+    if Match(Scanner.TokenType.ModOp, ind, False)["node"] != ["error"]:
         productions = [Scanner.TokenType.ModOp]
         return rule(productions, ind, "BinaryOperator")
     elif Match(Scanner.TokenType.RemOp, ind, False)["node"] != ["error"]:
@@ -351,6 +366,7 @@ def Value(ind):
         out["mode"] = ["error"]
         out["node"] = ["error"]
         out["index"] = ind
+        errors.append("Syntax error : " + F" Expected Value")
         return out
 
 
@@ -457,6 +473,7 @@ def parse():
     d_t_da1.title('Token Stream')
     d_t_da_pt = pt.Table(d_t_da1, dataframe=df, showtoolbar=True, showstatusbar=True)
     d_t_da_pt.show()
+
     # start Parsing
     node = Program(0)
 
@@ -471,4 +488,3 @@ def parse():
     Scanner.Tokens.clear()
     errors.clear()
     node.draw()
-
