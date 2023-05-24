@@ -5,18 +5,22 @@
 5.	Contents → Content Contents`
 6.	Contents` → Content Contents` | ε
 7.	Content → List | Block | Expression | ε
-8.	Block → dotimes ( identifier number ) Lists | when ( Expression ) Lists
+8.	Block → dotimes ( identifier Value ) Lists | when ( Expression ) Lists
 9.	Expression → Function | logicalTrue | logicalFalse
-10.	Function → read | UnaryFunction | BinaryFunction | OtherFunction
-11.	UnaryFunction → UnaryFunctionName Value | UnaryOperator identifier
+10.	Function → read | UnaryFunction | BinaryFunction | OtherFunction | UnaryBinaryFunction | BinaryMoreFunction
+11.	UnaryFunction → UnaryFunctionName Value
 12.	UnaryFunctionName → write | sin | cos | tan
 13.	BinaryFunction → SetqFunction | BinaryOperatorFunction
 14.	SetqFunction → setq identifier Value
 15.	BinaryOperatorFunction → BinaryOperator Value Value
 16.	OtherFunction → identifier Parameters
-17.	UnaryOperator → increment | decrement
-18.	BinaryOperator → + | - | * | \ | mod | rem | >= | <= | > | < | = | <>
-19.	Parameters → Value Parameters` | ε
-20.	Parameters` → Value Parameters` | ε
-21.	Value → logicalTrue | logicalFalse | string | Atom | ( Function )
-22.	Atom → identifier | number
+17. UnaryBinaryFunction → UnaryBinaryOperator identifier ExtraValue
+18. ExtraValue → Value | ε
+19.	UnaryBinaryOperator → increment | decrement
+20. BinaryMoreFunction → BinaryMoreOperators Value Value Parameters
+21. BinaryMoreOperators → + | - | * | \
+22.	BinaryOperator → mod | rem | >= | <= | > | < | = | <>
+23.	Parameters → Value Parameters` | ε
+24.	Parameters` → Value Parameters` | ε
+25.	Value → logicalTrue | logicalFalse | string | Atom | ( Function )
+26.	Atom → identifier | number
