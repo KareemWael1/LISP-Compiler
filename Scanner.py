@@ -89,9 +89,9 @@ Operators = {"+": TokenType.PlusOp,
              "<=": TokenType.LessThanOrEqualOp,
              ">=": TokenType.GreaterThanOrEqualOp,
              "=": TokenType.EqualOp,
+             "<>": TokenType.NotEqualOp,
              "<": TokenType.LessThanOp,
-             ">": TokenType.GreaterThanOp,
-             "<>": TokenType.NotEqualOp
+             ">": TokenType.GreaterThanOp
              }
 
 Tokens = []  # to add tokens to list
