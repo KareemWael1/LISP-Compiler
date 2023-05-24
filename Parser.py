@@ -298,22 +298,10 @@ def Parameters(index):
     out = {}
     if lookahead([Scanner.TokenType.Identifier, Scanner.TokenType.Number, Scanner.TokenType.OpenParenthesis,
                   Scanner.TokenType.LogicalTrue, Scanner.TokenType.LogicalFalse, Scanner.TokenType.String], index):
-        productions = [Value, Parameters_dash]
+        productions = [Value, Parameters]
         return rule(productions, index, "Parameters")
     else:
         out["node"] = Tree("Parameters", ["ε"])
-        out["index"] = index
-        return out
-
-
-def Parameters_dash(index):
-    out = {}
-    if lookahead([Scanner.TokenType.Identifier, Scanner.TokenType.Number, Scanner.TokenType.OpenParenthesis,
-                  Scanner.TokenType.LogicalTrue, Scanner.TokenType.LogicalFalse, Scanner.TokenType.String], index):
-        productions = [Value, Parameters_dash]
-        return rule(productions, index, "Parameters`")
-    else:
-        out["node"] = Tree("Parameters`", ["ε"])
         out["index"] = index
         return out
 

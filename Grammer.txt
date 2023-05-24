@@ -2,24 +2,23 @@
 2.	Lists → List Lists`
 3.	Lists` → List Lists` | ε
 4.	List → ( Content )
-7.	Content → List | Block | Expression | ε
-8.	Block → dotimes ( identifier Value ) Lists | when ( Expression ) Lists
-9.	Expression → Function | logicalTrue | logicalFalse
-10.	Function → ReadFunction | UnaryFunction | BinaryFunction | OtherFunction | UnaryBinaryFunction | BinaryMoreFunction
-11. ReadFunction → read ExtraValue
-12.	UnaryFunction → UnaryFunctionName Value
-13.	UnaryFunctionName → write | sin | cos | tan
-14.	BinaryFunction → SetqFunction | BinaryOperatorFunction
-15.	SetqFunction → setq identifier Value
-16.	BinaryOperatorFunction → BinaryOperator Value Value
-17.	OtherFunction → identifier Parameters
-18. UnaryBinaryFunction → UnaryBinaryOperator identifier ExtraValue
-19. ExtraValue → Value | ε
-20.	UnaryBinaryOperator → increment | decrement
-21. BinaryMoreFunction → BinaryMoreOperators Value Value Parameters
-22. BinaryMoreOperators → + | - | * | \
-23.	BinaryOperator → mod | rem | >= | <= | > | < | = | <>
-24.	Parameters → Value Parameters` | ε
-25.	Parameters` → Value Parameters` | ε
-26.	Value → logicalTrue | logicalFalse | string | Atom | ( Function )
-27.	Atom → identifier | number
+5.	Content → List | Block | Expression | ε
+6.	Block → dotimes ( identifier Value ) Lists | when ( Expression ) Lists
+7.	Expression → Function | logicalTrue | logicalFalse
+8.	Function → ReadFunction | UnaryFunction | BinaryFunction | OtherFunction | UnaryBinaryFunction | BinaryMoreFunction
+9. ReadFunction → read ExtraValue
+10.	UnaryFunction → UnaryFunctionName Value
+11.	UnaryFunctionName → write | sin | cos | tan
+12.	BinaryFunction → SetqFunction | BinaryOperatorFunction
+13.	SetqFunction → setq identifier Value
+14.	BinaryOperatorFunction → BinaryOperator Value Value
+15.	OtherFunction → identifier Parameters
+16. UnaryBinaryFunction → UnaryBinaryOperator identifier ExtraValue
+17. ExtraValue → Value | ε
+18.	UnaryBinaryOperator → increment | decrement
+19. BinaryMoreFunction → BinaryMoreOperators Value Value Parameters
+20. BinaryMoreOperators → + | - | * | \
+21.	BinaryOperator → mod | rem | >= | <= | > | < | = | <>
+22.	Parameters → Value Parameters` | ε
+23.	Value → logicalTrue | logicalFalse | string | Atom | ( Function )
+24.	Atom → identifier | number
