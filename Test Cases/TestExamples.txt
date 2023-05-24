@@ -2,7 +2,7 @@
 
 (dotimes (n 11)(write n) (write (* n n))
 
-(< x 6) (> x 6) (<> x 6)
+(< x 6) (> x 6) (mod x 6)
 
 ; Error:
 
