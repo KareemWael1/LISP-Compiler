@@ -301,6 +301,8 @@ operators_dfa = graphviz.Digraph('o', filename='operator')
 
 keywords_dfa.attr(size='12,9.5', rankdir='LR', ranksep='0.05', nodesep='0.2')
 operators_dfa.attr(size='13,9.5', rankdir='LR', ranksep='0.05', nodesep='0.2')
+constant_dfa.attr(size='6')
+
 
 #  constant dfa
 const_accept_states = [1, 3]
@@ -420,7 +422,7 @@ def check_end(idx, text):
     return False
 
 
-def create_dfa(wanted_dfa, wanted_transitions, accept_states, reject_states, st):
+def create_dfa(wanted_dfa, wanted_transitions, accept_states, reject_states, st, dummy):
     start_state = 0
     wanted_dfa.node(st, shape='rectangle', label="token", labelloc='top', labeljust='center')
 
@@ -429,6 +431,9 @@ def create_dfa(wanted_dfa, wanted_transitions, accept_states, reject_states, st)
         st = str(state)
         color = ''
         style = ''
+        if state == start_state:
+            wanted_dfa.edge( dummy , str(start_state))
+            wanted_dfa.node(dummy, style='invisible', width='0', height='0')
         if state in accept_states:
             shape = 'doublecircle'
         elif state in reject_states:
@@ -597,11 +602,11 @@ def display_animation():
 tokenize_button = tk.Button(root, text="Tokenize Input", command=scan, bg='lightblue', width=12)
 tokenize_button.pack()
 
-create_dfa(constant_dfa, Constant_transitions, const_accept_states, const_reject_states, '5')
-create_dfa(identifier_dfa, identifiers_transitions, iden_accept_states, iden_reject_states, '3')
-create_dfa(string_dfa, string_transitions, str_accpet_states, str_reject_states, '4')
-create_dfa(keywords_dfa, keywords_transition, key_accpet_states, key_reject_states, '28')
-create_dfa(operators_dfa, operators_transitions, op_accpet_states, op_reject_states, '12')
+create_dfa(constant_dfa, Constant_transitions, const_accept_states, const_reject_states, '5', '6')
+create_dfa(identifier_dfa, identifiers_transitions, iden_accept_states, iden_reject_states, '3', '4')
+create_dfa(string_dfa, string_transitions, str_accpet_states, str_reject_states, '4', '5')
+create_dfa(keywords_dfa, keywords_transition, key_accpet_states, key_reject_states, '28', '29')
+create_dfa(operators_dfa, operators_transitions, op_accpet_states, op_reject_states, '12', '13')
 
 
 # root.mainloop()
